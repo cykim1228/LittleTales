@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ZzanChatBot</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<form id="chatForm" method="post">
+    <input type="text" name="question" id="questionInput">
+    <input type="submit" value="전송">
+</form>
+<div id="chatHistory">
+    <ul id="chatList">
+    </ul>
+</div>
+<script>
+    $(document).ready(function () {
+        $('#chatForm').submit(function (event) {
+            event.preventDefault();  // 기본 폼 제출 동작 중단
+            var question = $('#questionInput').val();
+
+            $.ajax({
+                type: 'POST',
+                url: '{{ url_for("littlechat.chat") }}',
+                data: { question: question },
+                success: function (response) {
+                    $('#chatList').append(
+                    '<li>' + '답변 : ' + response[0] + '</li>'
+                    );
+                    $('#questionInput').val('');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
