@@ -9,58 +9,74 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f0f0f0;
-        }
-        .header {
-            background-color: #ffb3cc;
-            color: white;
-            text-align: center;
-            padding: 1em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden; /* 배경 영역을 벗어나는 부분 숨기기 */
+            animation: waveAnimation 40s infinite linear; /* 애니메이션 적용 */
         }
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2em;
-        }
-        .storybook {
-            background-color: white;
-            padding: 2em;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             text-align: center;
+            z-index: 1; /* 텍스트 등이 앞으로 오도록 z-index 설정 */
         }
-        .storybook img {
-            max-width: 100%;
-            height: auto;
-            margin-bottom: 1em;
+
+        @keyframes waveAnimation {
+            0% {
+                background-position: 0 0; /* 시작 위치 */
+            }
+            100% {
+                background-position: 100% 100%; /* 끝 위치 */
+            }
         }
+
+        /* 배경 이미지 설정 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            /* 백그라운드 이미지 웹 호스팅 https://i.ibb.co/2FdbQcy/background.png */
+            background-image: url("{{ url_for('static', filename='background.png') }}"); /* 배경 이미지 경로 설정 */
+            background-size: cover;
+            animation: waveAnimation 40s infinite linear; /* 애니메이션 적용 */
+        }
+
         .start-button {
-            background-color: #ff6699;
-            color: white;
-            border: none;
-            padding: 0.5em 1em;
-            border-radius: 4px;
-            font-size: 1.2em;
             cursor: pointer;
+            transition: transform 0.2s;
         }
         .start-button:hover {
-            background-color: #ff3366;
+            transform: scale(1.1);
+        }
+        .logo-wrapper {
+            background: white;
+            padding: 50px;
+            border-radius: 50%; /* 원형 모양으로 레이아웃 조절 */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3); /* 그림자 추가 */
+        }
+        .logo {
+            width: 450px; /* 로고 이미지의 너비 설정 */
+            height: 450px; /* 높이는 자동 조절 */
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>LITTLE TALES</h1>
-        <p>동화 생성 서비스</p>
-    </div>
     <div class="container">
-        <div class="storybook">
-            <img src="storybook_cover.jpg" alt="Magical Storybook">
-            <h2>Embark on a Magical Adventure</h2>
-            <p>Get ready to experience heartwarming tales filled with wonder and imagination. Our AI-generated stories are perfect for bedtime or playtime!</p>
-            <button class="start-button">Start Reading</button>
+        <div class="logo-wrapper">
+            <img class="logo" src="{{ url_for('static', filename='logo.png') }}" alt="로고">
         </div>
+        <img class="start-button" src="{{ url_for('static', filename='start_button.png') }}" alt="Start Button" width="350" height="150" onclick="redirectToFacePage()"/>
     </div>
-<a href="{{ url_for('littlechat.chat_index') }}" >챗봇 서비스</a>
+
+<!--    <a href="{{ url_for('littlechat.chat_index') }}" >챗봇 서비스</a>-->
+    <script>
+        function redirectToFacePage() {
+            window.location.href = "{{ url_for('littleface.face_index') }}";  // 다른 페이지로 이동할 URL을 입력하세요
+        }
+    </script>
 </body>
 </html>

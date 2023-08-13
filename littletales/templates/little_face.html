@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LITTLE TALES</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<div id="animalImages" style="display: none;">
+    <img src="{{ url_for('static', filename='animal_chicken.png') }}" data-animal="닭">
+    <img src="{{ url_for('static', filename='animal_cow.png') }}" data-animal="소">
+    <img src="{{ url_for('static', filename='animal_dog.png') }}" data-animal="개">
+    <img src="{{ url_for('static', filename='animal_dragon.png') }}" data-animal="용">
+    <img src="{{ url_for('static', filename='animal_horse.png') }}" data-animal="말">
+    <img src="{{ url_for('static', filename='animal_monkey.png') }}" data-animal="원숭이">
+    <img src="{{ url_for('static', filename='animal_pig.png') }}" data-animal="돼지">
+    <img src="{{ url_for('static', filename='animal_rabbit.png') }}" data-animal="토끼">
+    <img src="{{ url_for('static', filename='animal_rat.png') }}" data-animal="쥐">
+    <img src="{{ url_for('static', filename='animal_sheep.png') }}" data-animal="양">
+    <img src="{{ url_for('static', filename='animal_snake.png') }}" data-animal="뱀">
+    <img src="{{ url_for('static', filename='animal_tiger.png') }}" data-animal="호랑이">
+    <!-- 추가적인 동물 이미지들을 여기에 추가해주세요 -->
+</div>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8  offset-lg-2">
+            <img id="animalSlider" src="{{ url_for('static', filename='animal_chicken.png') }}" width="100%">
+            <!-- animalSlider id로 이미지 표시 -->
+        </div>
+    </div>
+</div>
+
+<div id="videoContainer" class="container">
+    <div class="row">
+        <div class="col-lg-8  offset-lg-2">
+            <h3 class="mt-5">Live Streaming</h3>
+            <img src="{{ url_for('littleface.video_feed') }}" width="100%">
+        </div>
+    </div>
+</div>
+
+<div id="successButton" style="display: none;">
+    <form id="readForm" action="{{ url_for('littleread.read_index') }}" method="post">
+        <input type="hidden" name="animal" id="animalInput">
+        <input type="submit" value="전송" />
+    </form>
+</div>
+
+<script>
+$(document).ready(function() {
+    var animalImages = [];
+    $("#animalImages img").each(function() {
+        animalImages.push({
+            src: $(this).attr("src"),
+            animal: $(this).data("animal")
+        });
+    });
+
+    // console.log(animalImages);
+    var currentIndex = 0;
+    var isHappy = false;  // 'happy' 동물 이미지가 나타났는지 여부
+    var interval; // 인터벌 변수 선언
+
+    function showNextImage() {
+        currentIndex = (currentIndex + 1) % animalImages.length;
+        var imageUrl = animalImages[currentIndex].src;
+        var animalName = animalImages[currentIndex-1].animal;
+
+        if (isHappy === true) {
+            clearInterval(interval); // 인터벌 중지
+
+            // yhat_result가 'happy'일 때, 해당 동물 이미지 파일명을 변수에 담아서 전송
+            $.ajax({
+                type: 'POST',
+                url: "{{ url_for('littleface.classification') }}",
+                data: { animal: animalName },
+                success: function(data) {
+                    console.log('동물 이미지 파일명 전송 성공 : ', animalName);
+                    // window.location.href = "{{ url_for('littlechat.chat_index') }}";
+                },
+                error: function() {
+                    console.error('동물 이미지 파일명 전송 오류');
+                }
+            });
+
+            // form 요소에 animal 값을 설정하고 버튼을 활성화
+            $("#animalInput").val(animalName);
+            $("#successButton").show();
+            // form을 제출하여 페이지 이동을 수행
+            // $("#chatForm").submit();
+
+            // 카메라 화면을 숨김
+            $("#videoContainer").hide();
+
+        } else {
+            $("#animalSlider").attr("src", imageUrl);
+        }
+
+    }
+
+    // AJAX 요청을 통해 'happy' 여부 확인
+    function checkHappyStatus() {
+        $.ajax({
+            type: 'GET',
+            url: "{{ url_for('littleface.check_happy_status') }}",
+            success: function(data) {
+                if (data === 'happy') {
+                    isHappy = true;  // 'happy' 동물 이미지가 나타났음을 표시
+                    clearInterval(statusCheckInterval); // 인터벌 중지
+                }
+            }
+        });
+    }
+
+    interval = setInterval(showNextImage, 5000);
+
+    // 일정 간격으로 'happy' 여부 확인
+    var statusCheckInterval = setInterval(checkHappyStatus, 1000);  // 1초마다 확인
+
+});
+</script>
+</body>
+</html>

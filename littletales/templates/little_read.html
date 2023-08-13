@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LITTLE TALES</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <h3 class="mt-5">생성 동화</h3>
+            <p id="typingEffect" style="white-space: pre-line;"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    var chatResponse = "{{ chat_response }}"; // chat_response 값을 가져옴
+    var typingEffectElement = $("#typingEffect");
+    var currentText = "";
+    var currentIndex = 0;
+
+    function typeText() {
+        if (currentIndex <= chatResponse.length) {
+            currentText = chatResponse.slice(0, currentIndex);
+            typingEffectElement.text(currentText);
+            currentIndex++;
+            setTimeout(typeText, 50); // 한 글자씩 타이핑하는 간격 (밀리초)
+        }
+    }
+
+    typeText();
+});
+</script>
+</body>
+</html>
