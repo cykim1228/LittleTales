@@ -24,16 +24,15 @@ mp_holistic = mp.solutions.holistic
 yhat_result = ''
 
 def gen_frames():  # generate frame by frame from camera
+
     global yhat_result  # yhat_result 값을 수정하기 위해 global 키워드 사용
-
-    camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-
+    camera = cv2.VideoCapture(0)
 
     with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=0.5) as holistic:
 
         while True:
-            # Capture frame-by-frame
-            success, frame = camera.read()  # read the camera frame
+
+            success, frame = camera.read()
 
             image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             image.flags.writeable = False
@@ -69,6 +68,7 @@ def gen_frames():  # generate frame by frame from camera
 
                 if yhat_result == 'happy':
                     print('카메라 종료 / yhat_result : ', yhat_result)
+                    # camera.release()
                     break
 
             except:
