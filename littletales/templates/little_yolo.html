@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LITTLE TALES</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+    body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden; /* 배경 영역을 벗어나는 부분 숨기기 */
+            animation: waveAnimation 40s infinite linear; /* 애니메이션 적용 */
+        }
+        .container {
+            text-align: center;
+            z-index: 1; /* 텍스트 등이 앞으로 오도록 z-index 설정 */
+        }
+        @keyframes waveAnimation {
+            0% {
+                background-position: 0 0; /* 시작 위치 */
+            }
+            100% {
+                background-position: 100% 100%; /* 끝 위치 */
+            }
+        }
+        /* 배경 이미지 설정 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            /* 백그라운드 이미지 웹 호스팅 https://i.ibb.co/2FdbQcy/background.png */
+            background-image: url("{{ url_for('static', filename='background.png') }}"); /* 배경 이미지 경로 설정 */
+            background-size: cover;
+            animation: waveAnimation 40s infinite linear; /* 애니메이션 적용 */
+        }
+        .image-container {
+            background-color: white; /* 배경을 하얀색으로 설정 */
+            border: 5px solid #000; /* 테두리 두께와 색상 설정 */
+            border-radius: 15px; /* 네모의 모서리 둥글게 처리 */
+            display: flex; /* Flexbox를 사용하여 가운데 정렬 설정 */
+            justify-content: center; /* 수평 가운데 정렬 */
+            align-items: center; /* 수직 가운데 정렬 */
+            padding: 10px; /* 테두리와 이미지 사이의 간격 */
+            width: 70%; /* 네모의 너비 설정 */
+            height: 60%; /* 네모의 높이 설정 */
+            margin: 0 auto; /* 가운데 정렬 */
+            overflow: hidden; /* 넘치는 부분 숨김 */
+            text-align: center; /* 이미지를 가운데에 위치 */
+        }
+
+        .image-container img {
+            max-width: 100%; /* 이미지의 최대 너비 설정 */
+            max-height: 100%; /* 이미지의 최대 높이 설정 */
+            border-radius: 10px; /* 이미지의 모서리 둥글게 처리 */
+        }
+        .video-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        #successButton {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        #animalSlider {
+            width: 100%;
+        }
+        .mt-5 {
+            margin-top: 5px;
+        }
+        .uploadcontainer {
+            background-color: white; /* 배경을 하얀색으로 설정 */
+            border: 5px solid #000; /* 테두리 두께와 색상 설정 */
+            border-radius: 15px; /* 네모의 모서리 둥글게 처리 */
+            display: flex; /* Flexbox를 사용하여 가운데 정렬 설정 */
+            justify-content: center; /* 수평 가운데 정렬 */
+            align-items: center; /* 수직 가운데 정렬 */
+            padding: 10px; /* 테두리와 이미지 사이의 간격 */
+            margin: 0 auto; /* 가운데 정렬 */
+            overflow: hidden; /* 넘치는 부분 숨김 */
+            text-align: center; /* 이미지를 가운데에 위치 */
+        }
+        .uploadcontainer:hover {
+            transform: scale(1.1);
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div id="" class="uploadcontainer">
+    <label for="photoInput">
+        <img src="{{ url_for('static', filename='upload_image.png') }}" id="uploadImage" alt="업로드 이미지">
+    </label>
+    <input type="file" id="photoInput" style="display: none;">
+    <div id="result"></div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#uploadImage").click(function () {
+            $("#photoInput").click();
+        });
+
+        $("#photoInput").change(function () {
+            uploadPhoto();
+        });
+    });
+
+    function uploadPhoto() {
+        var formData = new FormData();
+        var fileInput = $("#photoInput")[0];
+        var file = fileInput.files[0];
+
+        formData.append("photo", file);
+
+        $.ajax({
+            url: "/upload",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                $("#result").html("업로드 완료: " + response.message);
+            },
+            error: function (xhr, status, error) {
+                $("#result").html("에러 발생: " + error);
+            }
+        });
+    }
+</script>
+</body>
+</html>
