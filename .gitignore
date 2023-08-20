@@ -1,6 +1,12 @@
 # Created by https://www.toptal.com/developers/gitignore/api/pycharm,flask,python,jupyternotebooks
 # Edit at https://www.toptal.com/developers/gitignore?templates=pycharm,flask,python,jupyternotebooks
 
+# IntelliJ
+*.iml
+*.idea
+.idea
+misc.xml
+
 ### Flask ###
 instance/*
 !instance/.gitignore
