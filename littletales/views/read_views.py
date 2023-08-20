@@ -92,6 +92,7 @@ def make_gpt(animal_name):
     return result
 
 def make_llama(animal_name) :
+    print('동물 : ', animal_name)
 
     answer = gen2(
         f"Please make a fairy tale with the main character {animal_name} for the children's audience. Be creative and don't worry, and make a great fictional story for children",

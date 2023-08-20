@@ -45,10 +45,12 @@ print("라마2 다운")
 ##라마 다운 및 전처리
 model_llama2 = "meta-llama/Llama-2-7b-chat-hf"
 
+print("토크나이저")
 tokenizer = AutoTokenizer.from_pretrained(
     model_llama2,
     use_auth_token=True,
 )
+print("파이프라인")
 
 pipeline = transformers.pipeline(
     "text-generation",
@@ -58,6 +60,7 @@ pipeline = transformers.pipeline(
 )
 
 def gen2(x, max_length):
+    print("gen2 메서드 실행")
     sequences = pipeline(
         x,
         do_sample=True,
@@ -71,4 +74,4 @@ def gen2(x, max_length):
 
 answer = gen2(f"Please make a fairy tale with the main character {result_animals_name} for the children's audience. Be creative and don't worry, and make a great fictional story for children",1500)
 result = translator.translate_text(answer, target_lang="ko")
-print(result)
+print('결과 : ', result)
