@@ -89,16 +89,20 @@
             overflow: hidden; /* 넘치는 부분 숨김 */
             text-align: center; /* 이미지를 가운데에 위치 */
         }
-        .uploadcontainer:hover {
-            transform: scale(1.1);
-        }
+    .uploadcontainer #uploadImage {
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .uploadcontainer:hover #uploadImage {
+        transform: scale(1.1);
+    }
 
     </style>
 </head>
 
 <body>
 
-<div id="" class="uploadcontainer">
+<div id="uploadcontainer">
     <label for="photoInput">
         <img src="{{ url_for('static', filename='upload_image.png') }}" id="uploadImage" alt="업로드 이미지">
     </label>
@@ -106,38 +110,45 @@
     <div id="result"></div>
 </div>
 
-<script>
-    $(document).ready(function () {
-        $("#uploadImage").click(function () {
-            $("#photoInput").click();
-        });
+<div id="successButton" style="display: none;">
+    <form id="readForm" action="{{ url_for('littleread.read_index') }}" method="post">
+        <input type="hidden" name="animal" id="animalInput">
+        <input type="submit" value="전송" />
+    </form>
+</div>
 
-        $("#photoInput").change(function () {
+<script>
+    $(document).ready(function() {
+        // 파일 선택 시 업로드 함수 호출
+        $("#photoInput").change(function() {
             uploadPhoto();
         });
+
+        function uploadPhoto() {
+            var formData = new FormData();
+            var fileInput = $("#photoInput")[0];
+            var file = fileInput.files[0];
+
+            formData.append("photo", file);
+
+            $.ajax({
+                url: "{{ url_for('littleyolo.upload_and_detect') }}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    $("#animalInput").val(response.result);
+                    $("#successButton").show();
+                    $("#result").html("판별 결과: " + response.result);
+                },
+                error: function(xhr, status, error) {
+                    $("#result").html("에러 발생: " + error);
+                }
+            });
+        }
     });
-
-    function uploadPhoto() {
-        var formData = new FormData();
-        var fileInput = $("#photoInput")[0];
-        var file = fileInput.files[0];
-
-        formData.append("photo", file);
-
-        $.ajax({
-            url: "/upload",
-            type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                $("#result").html("업로드 완료: " + response.message);
-            },
-            error: function (xhr, status, error) {
-                $("#result").html("에러 발생: " + error);
-            }
-        });
-    }
 </script>
+
 </body>
 </html>

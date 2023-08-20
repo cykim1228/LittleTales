@@ -80,7 +80,7 @@
 
 <script>
 $(document).ready(function() {
-    var chatResponse = "{{ chat_response }}"; // chat_response 값을 가져옴
+    var chatResponse = "{{ chat_response|safe }}"; // chat_response 값을 가져옴
     var typingEffectElement = $("#typingEffect");
     var currentText = "";
     var currentIndex = 0;

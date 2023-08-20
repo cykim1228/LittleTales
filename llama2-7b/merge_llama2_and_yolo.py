@@ -1,7 +1,9 @@
-# import os
-# from huggingface_hub import login
+import os
 
-# login(token=os.environ.get("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")) #예찬 계정
+import huggingface_hub
+from huggingface_hub import login
+
+login(token=os.environ.get("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")) #예찬 계정
 
 from ultralytics import YOLO
 from transformers import AutoTokenizer
@@ -13,8 +15,8 @@ animals=['Bear', 'Cat', 'Dog', 'Duck', 'Lion', 'Panda', 'Rabbit', 'Tiger', 'Turt
 
 #모델 추론
 print("모델추론 시작")
-mode_yolo = YOLO('D:/littleTales/yolo/yolo_model.pt')
-results = mode_yolo.predict(source='D:/littleTales/yolo/lion.jpg',show=False,save=False)
+mode_yolo = YOLO('F:\PycharmProjects\littleTales\yolo\yolo_model.pt')
+results = mode_yolo.predict(source='F:\PycharmProjects\littleTales\yolo\lion.jpg',show=False,save=False)
 print("모델추론 끝")
 
 #후처리(욜로에서 디텍딩된 동물 이름 판별)

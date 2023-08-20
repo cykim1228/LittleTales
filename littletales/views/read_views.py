@@ -48,7 +48,7 @@ def make(animal_name):
         model="gpt-3.5-turbo",
         messages=messages,
         temperature=0.7,  # 다양한 답변을 유도하기 위해 온도를 조정해보세요 (기본값은 1.0)
-        max_tokens=500,  # 원하는 답변의 최대 토큰 길이를 설정하세요 (300자 이상의 답변을 원하시면 조정)
+        max_tokens=1000,  # 원하는 답변의 최대 토큰 길이를 설정하세요 (300자 이상의 답변을 원하시면 조정)
         stop=["\n"]
     )
 

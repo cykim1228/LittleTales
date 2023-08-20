@@ -4,8 +4,8 @@ from ultralytics import YOLO
 animals=['Bear', 'Cat', 'Dog', 'Duck', 'Lion', 'Panda', 'Rabbit', 'Tiger', 'Turtle']
 
 #모델 추론
-model = YOLO('D:/littleTales/yolo/yolo_model.pt')
-results = model.predict(source='D:/littleTales/yolo/lion.jpg',show=False,save=False)
+model = YOLO('F:\PycharmProjects\littleTales\yolo\yolo_model.pt')
+results = model.predict(source='F:\PycharmProjects\littleTales\yolo\lion.jpg',show=False,save=False)
 
 
 #후처리(욜로에서 디텍딩된 동물 이름 판별)
