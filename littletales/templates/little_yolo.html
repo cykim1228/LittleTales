@@ -5,7 +5,7 @@
     <title>LITTLE TALES</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-    body {
+        body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
@@ -56,7 +56,6 @@
             overflow: hidden; /* 넘치는 부분 숨김 */
             text-align: center; /* 이미지를 가운데에 위치 */
         }
-
         .image-container img {
             max-width: 100%; /* 이미지의 최대 너비 설정 */
             max-height: 100%; /* 이미지의 최대 높이 설정 */
@@ -88,33 +87,66 @@
             margin: 0 auto; /* 가운데 정렬 */
             overflow: hidden; /* 넘치는 부분 숨김 */
             text-align: center; /* 이미지를 가운데에 위치 */
+            cursor: pointer;
+            transition: transform 0.2s;
         }
-    .uploadcontainer #uploadImage {
-        transition: transform 0.2s ease-in-out;
-    }
-
-    .uploadcontainer:hover #uploadImage {
-        transform: scale(1.1);
-    }
-
+        .uploadcontainer:hover {
+            transform: scale(1.1);
+        }
+        /* 로딩 스피너 스타일 */
+        .loading-overlay {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .loading-overlay img {
+            width: 100px;
+            height: 100px;
+        }
+        .loading-spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-overlay.active {
+            display: flex; /* display를 flex로 변경하여 보여줍니다. */
+        }
     </style>
 </head>
 
 <body>
 
-<div id="uploadcontainer">
+<div id="uploadcontainer" class="uploadcontainer">
     <label for="photoInput">
         <img src="{{ url_for('static', filename='upload_image.png') }}" id="uploadImage" alt="업로드 이미지">
     </label>
     <input type="file" id="photoInput" style="display: none;">
-    <div id="result"></div>
 </div>
 
 <div id="successButton" style="display: none;">
+     <div id="result"></div>
     <form id="readForm" action="{{ url_for('littleread.read_index') }}" method="post">
         <input type="hidden" name="animal" id="animalInput">
         <input type="submit" value="전송" />
     </form>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <img src="{{ url_for('static', filename='cat_loading.gif') }}" alt="로딩 중">
 </div>
 
 <script>
@@ -131,6 +163,9 @@
 
             formData.append("photo", file);
 
+            // 로딩 스피너 표시
+            showLoading();
+
             $.ajax({
                 url: "{{ url_for('littleyolo.upload_and_detect') }}",
                 type: "POST",
@@ -139,14 +174,28 @@
                 contentType: false,
                 success: function(response) {
                     $("#animalInput").val(response.result);
-                    $("#successButton").show();
+                    $("#uploadcontainer").hide(); // 업로드 컨테이너 숨기기
+                    $("#successButton").show(); // 전송 버튼 보여주기
                     $("#result").html("판별 결과: " + response.result);
+                    hideLoading();
                 },
                 error: function(xhr, status, error) {
                     $("#result").html("에러 발생: " + error);
+                    hideLoading();
                 }
             });
         }
+
+        // 로딩 스피너 표시 함수
+        function showLoading() {
+            $("#loadingOverlay").addClass("active"); // 로딩 스피너 보여주기
+        }
+
+        // 로딩 스피너 숨김 함수
+        function hideLoading() {
+            $("#loadingOverlay").removeClass("active"); // 로딩 스피너 숨기기
+        }
+
     });
 </script>
 

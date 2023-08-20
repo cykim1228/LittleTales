@@ -7,12 +7,14 @@ import deepl
 import os
 from huggingface_hub import HfApi, Repository
 
-#deepl인증키 및 메소드 가져오기
+# deepl인증키 및 메소드 가져오기
 deepl_key = "d7ff04a7-09eb-0c77-558a-27575e0361d4:fx"
 translator = deepl.Translator(deepl_key)
 
-#허깅페이스 인증키 가져오기
-hugging_face_key ="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"
+# 허깅페이스 인증키 가져오기
+# 터미널에서 허깅페이스 로그인 선작업 해야함
+# huggingface-cli login
+hugging_face_key ="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"
 hf_token = os.environ.get(hugging_face_key)  
 api = HfApi()
 api.token = hf_token
