@@ -1,22 +1,29 @@
-import os
-
-import huggingface_hub
-from huggingface_hub import login
-
-login(token=os.environ.get("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")) #예찬 계정
 
 from ultralytics import YOLO
 from transformers import AutoTokenizer
 import transformers
 import torch
+import deepl
+import os
+from huggingface_hub import HfApi, Repository
+
+#deepl인증키 및 메소드 가져오기
+deepl_key = "d7ff04a7-09eb-0c77-558a-27575e0361d4:fx"
+translator = deepl.Translator(deepl_key)
+
+#허깅페이스 인증키 가져오기
+hugging_face_key ="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"
+hf_token = os.environ.get(hugging_face_key)  
+api = HfApi()
+api.token = hf_token
 
 #동물 클래스 생성
 animals=['Bear', 'Cat', 'Dog', 'Duck', 'Lion', 'Panda', 'Rabbit', 'Tiger', 'Turtle']
 
 #모델 추론
 print("모델추론 시작")
-mode_yolo = YOLO('F:\PycharmProjects\littleTales\yolo\yolo_model.pt')
-results = mode_yolo.predict(source='F:\PycharmProjects\littleTales\yolo\lion.jpg',show=False,save=False)
+mode_yolo = YOLO('../yolo/yolo_model.pt')
+results = mode_yolo.predict(source='../yolo/lion.jpg',show=False,save=False)
 print("모델추론 끝")
 
 #후처리(욜로에서 디텍딩된 동물 이름 판별)
@@ -60,5 +67,6 @@ def gen2(x, max_length):
 
     return sequences[0]["generated_text"].replace(x, "")
 
-print("결과출력")
-print(gen2(f"Please make a fairy tale with the main character {result_animals_name} for the children's audience. Be creative and don't worry, and make a great fictional story for children",1500))
+answer = gen2(f"Please make a fairy tale with the main character {result_animals_name} for the children's audience. Be creative and don't worry, and make a great fictional story for children",1500)
+result = translator.translate_text(answer, target_lang="ko")
+print(result)
