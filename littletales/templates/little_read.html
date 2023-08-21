@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>LITTLE TALES</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://webfontworld.github.io/cookierun/CookieRun.css" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,6 +12,7 @@
             padding: 0;
             display: flex;
             justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
             overflow: hidden; /* 배경 영역을 벗어나는 부분 숨기기 */
@@ -50,52 +52,98 @@
             justify-content: center; /* 수평 가운데 정렬 */
             align-items: center; /* 수직 가운데 정렬 */
             padding: 10px; /* 테두리와 이미지 사이의 간격 */
-            width: 600px; /* 네모의 너비 설정 */
-            height: 400px; /* 네모의 높이 설정 */
+            height: 100px; /* 네모의 높이 설정 */
             margin: 0 auto; /* 가운데 정렬 */
             overflow: hidden; /* 넘치는 부분 숨김 */
             text-align: center; /* 이미지를 가운데에 위치 */
             position: relative; /* 상대 위치 설정 */
+            white-space: pre-wrap; /* 텍스트가 넘칠 경우 줄바꿈을 하도록 설정 */
+            width: 100%;
+<!--            max-width: 800px; /* 최대 너비 설정 */-->
+            margin-top: 50px; /* 위로 50px 간격 설정 */
+            margin-bottom: 50px; /* 아래로 50px 간격 설정 */
+            font-family: 'CookieRun';
+            font-weight: bold;
+            font-size: 20px;
         }
-        .read-container img {
-            max-width: 100%; /* 이미지의 최대 너비 설정 */
-            max-height: 100%; /* 이미지의 최대 높이 설정 */
-            border-radius: 10px; /* 이미지의 모서리 둥글게 처리 */
+        .image-container {
+            /* 이미지 네모칸 스타일 */
+            background-color: white;
+            border: 5px solid #000;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 400px;
+            margin: 0 auto;
+            overflow: hidden;
+            text-align: center;
+            position: relative;
+            width: 80%;
+<!--            max-width: 800px; /* 최대 너비 설정 */-->
+            margin-top: 50px; /* 위로 50px 간격 설정 */
+            margin-bottom: 50px; /* 아래로 50px 간격 설정 */
         }
-        .read-container h3 {
-            position: absolute; /* 절대 위치 설정 */
-            top: 0; /* 상단에 고정 */
-            left: 50%; /* 가운데 정렬을 위한 왼쪽 위치 설정 */
-            transform: translateX(-50%); /* 가운데 정렬 조정 */
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 10px;
+        }
+        .container-wrapper {
+            width: 80%;
+<!--            max-width: 800px; /* 최대 너비 설정 */-->
+            margin: 50px auto; /* 위아래 50px 간격 설정, 나머지 중앙 정렬 */
         }
     </style>
 </head>
 <body>
-<div class="col-lg-8 offset-lg-2">
+
+<div class="main-div col-lg-8 offset-lg-2 " id="resizableDiv">
+    <div class="image-container">
+        <!-- 이미지 출력을 위한 컨테이너 -->
+        <img src="{{ url_for('static', filename='animal_chicken.png') }}" alt="이미지">
+    </div>
     <div class="read-container">
-        <h3 class="mt-5">생성 동화</h3>
-        <p id="typingEffect" style="white-space: pre-line;"></p>
+        <!-- 텍스트 출력을 위한 컨테이너 -->
+        <h3 class="mt-5" style="display: none;">생성 동화</h3>
+        <p id="chat-text" style="display: none;">{{ chat_response }}</p>
+        <p id="visible-text"></p>
     </div>
 </div>
 
 <script>
-$(document).ready(function() {
-    var chatResponse = "{{ chat_response|safe }}"; // chat_response 값을 가져옴
-    var typingEffectElement = $("#typingEffect");
-    var currentText = "";
-    var currentIndex = 0;
+    $(document).ready(function() {
+        var chatResponse = $("#chat-text").text();
+        var lines = chatResponse.split("\n"); // 줄바꿈으로 텍스트를 분리
+        var visibleText = $("#visible-text");
+        var lineIndex = 0;
+        var charIndex = 0;
 
-    function typeText() {
-        if (currentIndex <= chatResponse.length) {
-            currentText = chatResponse.slice(0, currentIndex);
-            typingEffectElement.text(currentText);
-            currentIndex++;
-            setTimeout(typeText, 50); // 한 글자씩 타이핑하는 간격 (밀리초)
+        function showNextLine() {
+            if (lineIndex < lines.length) {
+                var line = lines[lineIndex];
+                visibleText.text(line.substr(0, charIndex));
+                charIndex++;
+                if (charIndex > line.length) {
+                    charIndex = 0;
+                    lineIndex++;
+                    setTimeout(showNextLine, 4000); // 줄을 바꿀 때의 대기 시간 설정 (1000ms = 1초)
+                } else {
+                    setTimeout(showNextLine, 50); // 100ms마다 다음 글자 표시
+                }
+            }
         }
-    }
 
-    typeText();
-});
+        showNextLine();
+    });
+    function resizeDiv() {
+            const div = document.getElementById("resizableDiv");
+            const pageWidth = window.innerWidth;
+            const divWidth = (pageWidth * 0.8) + "px"; // 현재 웹페이지의 80% 크기 계산
+            div.style.width = divWidth;
+        }
+    resizeDiv();
+    window.addEventListener("resize", resizeDiv);
 </script>
 </body>
 </html>

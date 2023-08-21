@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>LITTLE TALES</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://webfontworld.github.io/cookierun/CookieRun.css" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -107,8 +108,8 @@
             z-index: 999;
         }
         .loading-overlay img {
-            width: 100px;
-            height: 100px;
+            width: 300px;
+            height: 250px;
         }
         .loading-spinner {
             border: 6px solid #f3f3f3;
@@ -125,6 +126,38 @@
         .loading-overlay.active {
             display: flex; /* display를 flex로 변경하여 보여줍니다. */
         }
+        #submitImage {
+        width: 200px; /* 원하는 크기로 조절 */
+        height: auto; /* 높이를 자동으로 조절하여 비율 유지 */
+        cursor: pointer;
+        }
+        .resultContainer {
+            background-color: white; /* 배경을 하얀색으로 설정 */
+            border: 5px solid #000; /* 테두리 두께와 색상 설정 */
+            border-radius: 15px; /* 네모의 모서리 둥글게 처리 */
+            display: flex; /* Flexbox를 사용하여 가운데 정렬 설정 */
+            justify-content: center; /* 수평 가운데 정렬 */
+            align-items: center; /* 수직 가운데 정렬 */
+            padding: 10px; /* 테두리와 이미지 사이의 간격 */
+            margin: 0 auto; /* 가운데 정렬 */
+            overflow: hidden; /* 넘치는 부분 숨김 */
+            text-align: center; /* 이미지를 가운데에 위치 */
+            cursor: pointer;
+            transition: transform 0.2s;
+            flex-direction: column;
+            font-family: 'CookieRun';
+            font-weight: bold;
+            font-size: 20px;
+            margin: 10px 0;
+        }
+        .resultContainer:hover {
+            transform: scale(1.1);
+        }
+        .resultContainer img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 10px;
+        }
     </style>
 </head>
 
@@ -138,11 +171,15 @@
 </div>
 
 <div id="successButton" style="display: none;">
-     <div id="result"></div>
-    <form id="readForm" action="{{ url_for('littleread.read_index') }}" method="post">
-        <input type="hidden" name="animal" id="animalInput">
-        <input type="submit" value="전송" />
-    </form>
+    <div id="resultContainer" class="resultContainer">
+        <div id="result"></div>
+        <form id="readForm" action="{{ url_for('littleread.read_index') }}" method="post">
+            <input type="hidden" name="animal" id="animalInput">
+            <!-- 이미지 버튼으로 대체 -->
+            <input type="image" src="{{ url_for('static', filename='continue_button.png') }}" id="submitImage" alt="전송" />
+    <!--        <input type="submit" value="전송" />-->
+        </form>
+    </div>
 </div>
 
 <div class="loading-overlay" id="loadingOverlay">
@@ -151,6 +188,11 @@
 
 <script>
     $(document).ready(function() {
+
+        $(window).on('beforeunload', function() {
+            showLoading();
+        });
+
         // 파일 선택 시 업로드 함수 호출
         $("#photoInput").change(function() {
             uploadPhoto();

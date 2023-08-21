@@ -94,13 +94,28 @@ def make_gpt(animal_name):
 def make_llama(animal_name) :
     print('동물 : ', animal_name)
 
-    answer = gen2(
-        f"Please make a fairy tale with the main character {animal_name} for the children's audience. Be creative and don't worry, and make a great fictional story for children",
-        1500)
-    result = translator.translate_text(answer, target_lang="ko")
-    print('답변 : ', result)
+    while True :
+        answer = gen2(
+            f"Please make a fairy tale with the main character {animal_name} for the children's audience. Be creative and don't worry, and make a great fictional story for children",
+            1500)
+        print('answer : ', answer)
+        if len(str(answer)) > 200 :
+            break
 
-    return result
+    result = translator.translate_text(answer, target_lang="ko")
+    result = str(result).strip().split("\n")
+
+    result_str = ""
+    for i in result:
+        if (len(i) > 4):
+            # print(i)
+            result_str += i + "\n"
+
+    result_str += '-끝-'
+
+    print('답변 : ', result_str)
+
+    return result_str
 
 def gen2(x, max_length):
     sequences = pipeline(
