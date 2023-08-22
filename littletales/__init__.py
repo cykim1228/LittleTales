@@ -19,4 +19,7 @@ def create_app() :
     from .views import yolo_views
     app.register_blueprint(yolo_views.bp)
 
+    from .views import image_views
+    app.register_blueprint(image_views.bp)
+
     return app

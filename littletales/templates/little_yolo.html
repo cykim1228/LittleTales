@@ -127,9 +127,10 @@
             display: flex; /* display를 flex로 변경하여 보여줍니다. */
         }
         #submitImage {
-        width: 200px; /* 원하는 크기로 조절 */
+        width: 100px; /* 원하는 크기로 조절 */
         height: auto; /* 높이를 자동으로 조절하여 비율 유지 */
         cursor: pointer;
+        transform: rotate(-90deg); /* 90도 반시계 방향으로 뒤집음 */
         }
         .resultContainer {
             background-color: white; /* 배경을 하얀색으로 설정 */
@@ -149,14 +150,10 @@
             font-weight: bold;
             font-size: 20px;
             margin: 10px 0;
+            width:400px;
         }
         .resultContainer:hover {
             transform: scale(1.1);
-        }
-        .resultContainer img {
-            max-width: 100%;
-            max-height: 100%;
-            border-radius: 10px;
         }
     </style>
 </head>
