@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LITTLE TALES</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden; /* 배경 영역을 벗어나는 부분 숨기기 */
+            animation: waveAnimation 40s infinite linear; /* 애니메이션 적용 */
+        }
+        .container {
+            background-color: white; /* 배경을 하얀색으로 설정 */
+            text-align: center;
+            z-index: 1; /* 텍스트 등이 앞으로 오도록 z-index 설정 */
+        }
+
+        @keyframes waveAnimation {
+            0% {
+                background-position: 0 0; /* 시작 위치 */
+            }
+            100% {
+                background-position: 100% 100%; /* 끝 위치 */
+            }
+        }
+
+        /* 배경 이미지 설정 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            /* 백그라운드 이미지 웹 호스팅 https://i.ibb.co/2FdbQcy/background.png */
+            background-image: url("{{ url_for('static', filename='background.png') }}"); /* 배경 이미지 경로 설정 */
+            background-size: cover;
+            animation: waveAnimation 40s infinite linear; /* 애니메이션 적용 */
+        }
+
+        .start-button {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .start-button:hover {
+            transform: scale(1.1);
+        }
+        .logo-wrapper {
+            background: white;
+            padding: 50px;
+            border-radius: 50%; /* 원형 모양으로 레이아웃 조절 */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3); /* 그림자 추가 */
+        }
+        .logo {
+            width: 350px; /* 로고 이미지의 너비 설정 */
+            height: 350px; /* 높이는 자동 조절 */
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <canvas id="drawingCanvas" width="500" height="500"></canvas>
+        <div>
+            <button onclick="undo()">Undo</button>
+            <button onclick="redo()">Redo</button>
+            <button onclick="clearCanvas()">Clear</button>
+            <input type="color" id="colorPicker" value="#000000">
+            <button onclick="useEraser()">Eraser</button>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById("drawingCanvas");
+        const ctx = canvas.getContext("2d");
+        let painting = false;
+        let color = "#000000";
+        let usingEraser = false;
+        const paths = [];
+        let currentPath = [];
+        let redoStack = [];
+
+        canvas.addEventListener("mousedown", () => {
+            painting = true;
+            currentPath = [];
+        });
+
+        canvas.addEventListener("mouseup", () => {
+            painting = false;
+            ctx.beginPath();
+            paths.push(currentPath);
+            redoStack = [];  // clear the redo stack whenever a new stroke is added
+        });
+
+        canvas.addEventListener("mousemove", draw);
+
+        function draw(e) {
+            if (!painting) return;
+
+            ctx.lineWidth = 6;
+            ctx.lineCap = "round";
+
+            if (usingEraser) {
+                ctx.globalCompositeOperation = "destination-out";
+            } else {
+                ctx.globalCompositeOperation = "source-over";
+            }
+
+            ctx.strokeStyle = color;
+
+            ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+
+            currentPath.push({ x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop });
+        }
+
+        document.getElementById("colorPicker").addEventListener("change", (e) => {
+            usingEraser = false;
+            color = e.target.value;
+        });
+
+        function undo() {
+            if (paths.length === 0) return;
+
+            redoStack.push(paths.pop());
+            redraw();
+        }
+
+        function redo() {
+            if (redoStack.length === 0) return;
+
+            paths.push(redoStack.pop());
+            redraw();
+        }
+
+        function redraw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (const path of paths) {
+                ctx.beginPath();
+
+                for (const point of path) {
+                    ctx.lineTo(point.x, point.y);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(point.x, point.y);
+                }
+            }
+        }
+
+        function clearCanvas() {
+            paths.length = 0;
+            redoStack.length = 0;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function useEraser() {
+            usingEraser = true;
+        }
+    </script>
+</body>
+</html>
