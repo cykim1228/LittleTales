@@ -69,6 +69,7 @@
 </head>
 <body>
     <div class="container">
+        <p>선택한 동물 : {{ animal_name }}</p>
         <canvas id="drawingCanvas" width="500" height="500"></canvas>
         <div>
             <button onclick="undo()">Undo</button>
@@ -76,6 +77,8 @@
             <button onclick="clearCanvas()">Clear</button>
             <input type="color" id="colorPicker" value="#000000">
             <button onclick="useEraser()">Eraser</button>
+            <input type="file" id="fileInput" accept="image/*">
+            <button onclick="uploadImage()">Upload Image</button>
         </div>
     </div>
     <script>
@@ -167,6 +170,28 @@
         function useEraser() {
             usingEraser = true;
         }
+
+        function uploadImage() {
+            const fileInput = document.getElementById("fileInput");
+            const file = fileInput.files[0];
+            if (file) {
+                const formData = new FormData();
+                formData.append("image", file);
+
+                fetch("/upload_image", {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Image uploaded:", data.message);
+                })
+                .catch(error => {
+                    console.error("Error uploading image:", error);
+                });
+            }
+        }
+
     </script>
 </body>
 </html>
