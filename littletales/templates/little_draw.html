@@ -65,203 +65,203 @@
         canvas {
             border: 1px solid black;
         }
+        .color-button {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%; /* 원형으로 만들기 위한 속성 */
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+            outline: none;
+        }
+
+        .color-button:focus {
+            box-shadow: 0 0 0 2px white, 0 0 0 4px black; /* 선택된 버튼을 강조하기 위한 외곽선 */
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <p>선택한 동물 : {{ animal_name }}</p>
-        <button id="pen">펜</button>
-        <button id="paint">채우기</button>
-        <button id="eraser">지우개</button>
-        <button id="clear">초기화</button>
-        <input type="color" id="colorPicker" value="#000000">
-        <input type="number" id="lineWidth" min="1" max="50" value="5">
+        <div class="controls">
+            <!-- 색상 선택기 -->
+            <label for="colorPicker">Color:</label>
+            <input type="color" id="colorPicker" value="#000000">
 
-        <canvas id="drawingCanvas" width="500" height="500"></canvas>
+            <!-- 버킷 페인트 (전체 캔버스 채우기) -->
+            <button onclick="useBucketFill()">Bucket Fill</button>
+
+            <!-- 경로 따라 채우기 -->
+            <button onclick="fillAlongPath()">Fill Along Path</button>
+
+            <!-- 지우개 도구 -->
+            <button onclick="useEraser()">Eraser</button>
+
+            <!-- 되돌리기 / 다시하기 -->
+            <button onclick="undo()">Undo</button>
+            <button onclick="redo()">Redo</button>
+
+            <!-- 캔버스 초기화 -->
+            <button onclick="clearCanvas()">Clear</button>
+
+            <!-- 이미지 업로드 -->
+            <button onclick="uploadImage()">Upload Image</button>
+
+            <div class="color-palette">
+                <button class="color-button" style="background-color: black;" onclick="changeColor('#000000')"></button>
+                <button class="color-button" style="background-color: white;" onclick="changeColor('#FFFFFF')"></button>
+                <button class="color-button" style="background-color: red;" onclick="changeColor('#FF0000')"></button>
+                <button class="color-button" style="background-color: orange;" onclick="changeColor('#FFA500')"></button>
+                <button class="color-button" style="background-color: yellow;" onclick="changeColor('#FFFF00')"></button>
+                <button class="color-button" style="background-color: green;" onclick="changeColor('#008000')"></button>
+                <button class="color-button" style="background-color: blue;" onclick="changeColor('#0000FF')"></button>
+                <button class="color-button" style="background-color: navy;" onclick="changeColor('#000080')"></button>
+                <button class="color-button" style="background-color: purple;" onclick="changeColor('#800080')"></button>
+            </div>
+
+        </div>
+        <canvas id="drawingCanvas" width="500" height="500" style="border:1px solid #000;"></canvas>
     </div>
     <script>
         const canvas = document.getElementById("drawingCanvas");
         const ctx = canvas.getContext("2d");
+        let painting = false;
+        let color = "#000000";
+        let usingEraser = false;
+        const paths = [];
+        let currentPath = [];
+        let redoStack = [];
 
-        const PEN = 1;
-        const PAINT = 2;
-        const ERASER = 3;
+        canvas.addEventListener("mousedown", () => {
+            painting = true;
+            currentPath = [];
+        });
 
-        let tool = PEN;
-        let isDrawing = false;
+        canvas.addEventListener("mouseup", () => {
+            painting = false;
+            ctx.beginPath();
+            paths.push(currentPath);
+            redoStack = [];  // clear the redo stack whenever a new stroke is added
+        });
 
-        // 펜 및 페인트 버튼 참조
-        const pen = document.getElementById("pen");
-        const paint = document.getElementById("paint");
-        const eraser = document.getElementById("eraser");
-        const clear = document.getElementById("clear");
-        const colorPicker = document.getElementById("colorPicker");
-        const lineWidth = document.getElementById("lineWidth");
+        canvas.addEventListener("mousemove", draw);
 
-        // 이벤트 리스너 설정
-        pen.addEventListener("click", () => master(PEN));
-        paint.addEventListener("click", () => master(PAINT));
-        eraser.addEventListener("click", () => master(ERASER));
-        clear.addEventListener("click", () => ctx.clearRect(0, 0, canvas.width, canvas.height));
-        colorPicker.addEventListener('change', changeColor);
-        lineWidth.addEventListener('change', changeLineWidth);
-
-        function changeColor(event) {
-            ctx.strokeStyle = event.target.value;
-            ctx.fillStyle = event.target.value;
+        function changeColor(newColor) {
+            color = newColor;
+            usingEraser = false;
         }
 
-        function changeLineWidth(event) {
-            ctx.lineWidth = event.target.value;
+        function useBucketFill() {
+            ctx.fillStyle = color;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
-        if (paint) {
-          paint.addEventListener("click", () => master(PAINT));
-        }
+        function fillAlongPath() {
+            ctx.fillStyle = color;
+            ctx.beginPath();
 
-        if (pen) {
-          pen.addEventListener("click", () => master(PEN));
-        }
-
-        function deleteToolEvent(ktool) {
-            switch (ktool) {
-                case PEN :
-                case ERASER:
-                    canvas.removeEventListener("mousemove", penEvent.move);
-                    canvas.removeEventListener("mousedown", penEvent.draw);
-                    canvas.removeEventListener("mouseup", penEvent.stopDraw);
-                    canvas.removeEventListener("mouseleave", penEvent.stopDraw);
-                    break;
-                case PAINT :
-                    canvas.removeEventListener("click", paintEvent.draw);
-                    break;
+            for (const path of paths) {
+                for (let i = 0; i < path.length; i++) {
+                    const { x, y } = path[i];
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
             }
+
+            ctx.closePath();
+            ctx.fill();
         }
 
-        function addToolEvent(ktool) {
-            switch (ktool) {
-                case PEN :
-                case ERASER:
-                    canvas.addEventListener("mousemove", penEvent.move);
-                    canvas.addEventListener("mousedown", penEvent.draw);
-                    canvas.addEventListener("mouseup", penEvent.stopDraw);
-                    canvas.addEventListener("mouseleave", penEvent.stopDraw);
-                    break;
-                case PAINT :
-                    canvas.addEventListener("click", paintEvent.draw);
-                    break;
-            }
-        }
+        function draw(e) {
+            if (!painting) return;
 
-        function master(ktool) {
-            deleteToolEvent(tool);
-            if (ktool === ERASER) {
+            ctx.lineWidth = 6;
+            ctx.lineCap = "round";
+
+            if (usingEraser) {
                 ctx.globalCompositeOperation = "destination-out";
-                ctx.strokeStyle = "rgba(0,0,0,1)";
             } else {
                 ctx.globalCompositeOperation = "source-over";
-                ctx.strokeStyle = colorPicker.value;
-                ctx.fillStyle = colorPicker.value;
             }
-            tool = ktool;
-            addToolEvent(ktool);
+
+            ctx.strokeStyle = color;
+
+            ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+
+            currentPath.push({ x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop });
         }
 
-        const penEvent = {
-            move : function (event) {
-                const x = event.offsetX;
-                const y = event.offsetY;
+        document.getElementById("colorPicker").addEventListener("change", (e) => {
+            usingEraser = false;
+            color = e.target.value;
+        });
 
-                if (isDrawing === false) {
-                    ctx.beginPath();
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
+        function undo() {
+            if (paths.length === 0) return;
+
+            redoStack.push(paths.pop());
+            redraw();
+        }
+
+        function redo() {
+            if (redoStack.length === 0) return;
+
+            paths.push(redoStack.pop());
+            redraw();
+        }
+
+        function redraw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (const path of paths) {
+                ctx.beginPath();
+
+                for (const point of path) {
+                    ctx.lineTo(point.x, point.y);
                     ctx.stroke();
-                }
-            },
-            draw : function () {
-                isDrawing = true;
-            },
-            stopDraw : function () {
-                isDrawing = false;
-            }
-        };
-
-        function floodFill(canvas, x, y, targetColor, fillColor) {
-            const ctx = canvas.getContext('2d');
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
-            const stack = [];
-            stack.push([x, y]);
-
-            while (stack.length) {
-                let [curX, curY] = stack.pop();
-                let idx = (curY * canvas.width + curX) * 4;
-
-                while (curY-- >= 0 && compareColors(data, idx, targetColor)) {
-                    idx -= canvas.width * 4;
-                }
-                idx += canvas.width * 4;
-                curY++;
-                let spanLeft = false;
-                let spanRight = false;
-
-                while (curY++ < canvas.height && compareColors(data, idx, targetColor)) {
-                    setColor(data, idx, fillColor);
-
-                    if (curX > 0) {
-                        if (compareColors(data, idx - 4, targetColor)) {
-                            if (!spanLeft) {
-                                stack.push([curX - 1, curY]);
-                                spanLeft = true;
-                            }
-                        } else if (spanLeft) {
-                            spanLeft = false;
-                        }
-                    }
-
-                    if (curX < canvas.width - 1) {
-                        if (compareColors(data, idx + 4, targetColor)) {
-                            if (!spanRight) {
-                                stack.push([curX + 1, curY]);
-                                spanRight = true;
-                            }
-                        } else if (spanRight) {
-                            spanRight = false;
-                        }
-                    }
-
-                    idx += canvas.width * 4;
+                    ctx.beginPath();
+                    ctx.moveTo(point.x, point.y);
                 }
             }
-
-            ctx.putImageData(imageData, 0, 0);
         }
 
-        const paintEvent = {
-            draw: function (event) {
-                const x = event.offsetX;
-                const y = event.offsetY;
-
-                const ctx = canvas.getContext('2d');
-                const pixel = ctx.getImageData(x, y, 1, 1).data;
-                const targetColor = [pixel[0], pixel[1], pixel[2], pixel[3]];
-                const fillColor = ctx.fillStyle.match(/\d+/g).map(Number);
-
-                floodFill(canvas, x, y, targetColor, fillColor);
-            }
-        };
-
-        function compareColors(data, idx, color) {
-            return data[idx] === color[0] && data[idx + 1] === color[1] && data[idx + 2] === color[2] && data[idx + 3] === color[3];
+        function clearCanvas() {
+            paths.length = 0;
+            redoStack.length = 0;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
-        function setColor(data, idx, color) {
-            data[idx] = color[0];
-            data[idx + 1] = color[1];
-            data[idx + 2] = color[2];
-            data[idx + 3] = color[3];
+        function useEraser() {
+            usingEraser = true;
+        }
+
+        function uploadImage() {
+            const canvas = document.getElementById("drawingCanvas");
+            const image = canvas.toDataURL("image/png");
+
+            fetch("/littledraw/upload_image", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    image: image,
+                    animal_name: "{{ animal_name }}"
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Image uploaded:", data.message);
+            })
+            .catch(error => {
+                console.error("Error uploading image:", error);
+            });
         }
 
     </script>
