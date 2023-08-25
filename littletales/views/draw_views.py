@@ -1,7 +1,8 @@
 import base64
 import os
-
 from flask import Blueprint, request, render_template, jsonify
+from littletales.gpt_function.check_drawing import chat_drawing_check
+
 
 bp = Blueprint('littledraw', __name__, url_prefix='/littledraw')
 
@@ -9,7 +10,6 @@ UPLOAD_FOLDER = 'uploads'
 
 @bp.route('/')
 def draw_index() :
-
     return render_template('little_input.html')
 
 @bp.route('/canvas', methods=['POST'])
@@ -29,11 +29,20 @@ def upload_image():
     if image_data and animal_name:
         # 이미지 데이터를 base64로 디코딩하여 이미지 파일로 저장
         image_data = image_data.replace("data:image/png;base64,", "")
-        image_path = os.path.join('littletales', UPLOAD_FOLDER, f"{animal_name}.png")
+        image_path = os.path.join('littletales', UPLOAD_FOLDER, f"{animal_name}.jpg")
+
+        result_image_path= "/".join(image_path.split("\\"))
 
         with open(image_path, "wb") as image_file:
             image_file.write(base64.b64decode(image_data))
 
-        return jsonify({"message": "Image uploaded successfully."}), 200
+    a=chat_drawing_check(animal_name,result_image_path)
+    if a:
+        print("잘그림")
+    else:
+        print("못그림")
+
+
+    return jsonify({"message": "Image uploaded successfully."}), 200
 
     return jsonify({"message": "Invalid image data or animal name."}), 400
