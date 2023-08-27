@@ -22,4 +22,7 @@ def create_app() :
     from .views import image_views
     app.register_blueprint(image_views.bp)
 
+    from .views import draw_views
+    app.register_blueprint(draw_views.bp)
+
     return app
