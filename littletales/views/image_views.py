@@ -4,7 +4,8 @@ import os
 import openai
 import dotenv
 from rembg import remove
-from transformers import GPT2Tokenizer
+#필요 없음
+#from transformers import GPT2Tokenizer
 import json
 
 #플라스크 부분은 주석처리 해 둠
@@ -39,17 +40,17 @@ print("배경 제거 완료")
 output.save('rembg.png')
 print("배경제거된 이미지 저장 완료")
 
-# GPT-2 토크나이저 로드
-tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+# # GPT-2 토크나이저 로드
+# tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
 
 # 프롬프트 입력
 prompt = input("depict the background as a fairy tale with the characteristics of the painting: ")
 
-# 프롬프트를 토큰화_방법1
-#inputs = tokenizer(prompt, return_tensors="pt")
-# 프롬프트를 토큰화_방법2
-tokens = tokenizer.tokenize(prompt)
-token_ids = tokenizer.convert_tokens_to_ids(tokens)
+# # 프롬프트를 토큰화_방법1
+# #inputs = tokenizer(prompt, return_tensors="pt")
+# # 프롬프트를 토큰화_방법2
+# tokens = tokenizer.tokenize(prompt)
+# token_ids = tokenizer.convert_tokens_to_ids(tokens)
 
 print("프롬프트 입력 완료")
 
