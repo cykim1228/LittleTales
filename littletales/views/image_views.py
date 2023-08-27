@@ -44,7 +44,7 @@ print("배경제거된 이미지 저장 완료")
 # tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
 
 # 프롬프트 입력
-prompt = input("depict the background as a fairy tale with the characteristics of the painting: ")
+prompt = "depict the background as a fairy tale with the characteristics of the painting "
 
 # # 프롬프트를 토큰화_방법1
 # #inputs = tokenizer(prompt, return_tensors="pt")
@@ -62,14 +62,21 @@ print("프롬프트 입력 완료")
 response = openai.Image.create_edit(
   image=open("rembg.png", "rb"),  # 수정된 파일 이름
   mask=open("rembg.png", "rb"),   # 수정된 파일 이름
-  prompt=prompt,
+  prompt="depict the background as a fairy tale with the characteristics of the painting",
   n=1,
   size="1024x1024"
 )
-print("이미지 생성")
-
+print("이미지 생성 완료")
 image_url = response['data'][0]['url']
 
+# 생성된 이미지 다운로드 및 저장
+image_response = requests.get(image_url)
+with open("generated_image.png", "wb") as f:
+    f.write(image_response.content)
+
+# 이미지를 열어서 보여주기
+image = Image.open("generated_image.png")
+image.show()
 # 생성된 이미지 플롯
 # image = response.edits[0].image
 # image.save('result.png')
