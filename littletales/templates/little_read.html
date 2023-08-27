@@ -101,7 +101,8 @@
 <div class="main-div col-lg-8 offset-lg-2 " id="resizableDiv">
     <div class="image-container">
         <!-- 이미지 출력을 위한 컨테이너 -->
-        <img src="{{ url_for('static', filename='animal_chicken.png') }}" alt="이미지">
+{#        <img src="{{ url_for('static', filename='animal_chicken.png') }}" alt="이미지">#}
+        <img src="{{ url_for('main.generated_file', filename=image_response) }}" alt="Generated Image" width="500">
     </div>
     <div class="read-container">
         <!-- 텍스트 출력을 위한 컨테이너 -->
@@ -135,15 +136,19 @@
         }
 
         showNextLine();
+
     });
+
     function resizeDiv() {
             const div = document.getElementById("resizableDiv");
             const pageWidth = window.innerWidth;
             const divWidth = (pageWidth * 0.8) + "px"; // 현재 웹페이지의 80% 크기 계산
             div.style.width = divWidth;
         }
+
     resizeDiv();
     window.addEventListener("resize", resizeDiv);
+
 </script>
 </body>
 </html>

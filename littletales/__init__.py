@@ -25,4 +25,6 @@ def create_app() :
     from .views import draw_views
     app.register_blueprint(draw_views.bp)
 
+    app.config['SECRET_KEY'] = 'zzanzzan'
+
     return app

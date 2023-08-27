@@ -1,3 +1,6 @@
+import base64
+import io
+
 import dotenv
 import torch
 import transformers
@@ -11,6 +14,14 @@ import openai
 from transformers import AutoTokenizer
 from huggingface_hub import HfApi, Repository
 import deepl
+from PIL import Image
+import requests
+import os
+import openai
+import dotenv
+from flask import Blueprint, request, render_template, jsonify, session
+from rembg import remove
+from base64 import decodebytes
 
 bp = Blueprint('littleread', __name__, url_prefix='/littleread')
 
@@ -18,6 +29,11 @@ dotenv_file = dotenv.find_dotenv()
 dotenv.load_dotenv(dotenv_file)
 
 key = os.environ["OPENAI_API_KEY"]
+
+# API 키 설정
+openai.organization = "org-jUejdT5GvU7fyKtp3IAwwin9"
+openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.Model.list()
 
 # # deepl인증키 및 메소드 가져오기
 # deepl_key = "d7ff04a7-09eb-0c77-558a-27575e0361d4:fx"
@@ -47,8 +63,28 @@ key = os.environ["OPENAI_API_KEY"]
 
 @bp.route('/', methods=['POST'])
 def read_index() :
-    animal_name = request.form.get('animal')
+
+    animal_name = request.form['animal']
+    image_data_url = request.form['image']
+
+    header, image_data_base64 = image_data_url.split(',', 1)
+    image_data = base64.b64decode(image_data_base64)
+
     print('판별된 동물 : ', animal_name)
+
+    # 이미지 데이터를 임시 파일로 저장
+    generated_image_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'generated', 'temp_image.png')
+
+    with open(generated_image_path, "wb") as f:
+        f.write(image_data)
+
+    print('이미지 저장 완료 :', generated_image_path)
+
+    # 이미지 데이터를 직접 로드합니다.
+    with open(generated_image_path, "rb") as f:
+        actual_image_data = f.read()
+
+    image_response = gen_image(actual_image_data)
 
     chat_response = None
 
@@ -56,8 +92,58 @@ def read_index() :
         # chat_response = make_llama(animal_name)
         chat_response = make_gpt(animal_name)
 
+    print('키워드 : ', animal_name)
     print('생성 동화 : ', chat_response)
-    return render_template('little_read.html', animal_name=animal_name, chat_response=chat_response)
+    print('이미지 경로 : ', image_response)
+
+    session['animal_name'] = animal_name
+    session['chat_response'] = chat_response
+    session['image_response'] = image_response
+
+
+    return render_template('little_read.html', animal_name=animal_name, chat_response=chat_response, image_response=image_response)
+
+
+def gen_image(image_data) :
+    # 이미지 데이터를 PIL.Image 형식으로 열기
+    image = Image.open(io.BytesIO(image_data))
+    print("이미지 불러오기 완료")
+
+    # 배경 제거
+    output = remove(image)
+    print("배경 제거 완료")
+
+    # 이미지 저장 (rembg.png 로 저장)
+    rembg_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'generated', 'rembg.png')
+    output.save(rembg_path)
+    print("배경제거된 이미지 저장 완료 : ", rembg_path)
+
+    prompt = "depict the background as a fairy tale with the characteristics of the painting "
+    print("프롬프트 입력 완료 : ", prompt)
+
+    # 이미지 생성
+    response = openai.Image.create_edit(
+        image=open(rembg_path, "rb"),  # 수정된 파일 이름
+        mask=open(rembg_path, "rb"),  # 수정된 파일 이름
+        prompt=prompt,
+        n=1,
+        size="1024x1024"
+    )
+
+    image_url = response['data'][0]['url']
+    print("이미지 생성 완료 : ", image_url)
+
+    # 생성된 이미지 다운로드 및 저장
+    generated_image_name = 'generated_image.png'
+    generated_image_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'generated', generated_image_name)
+    image_response = requests.get(image_url)
+    with open(generated_image_path, "wb") as f:
+        f.write(image_response.content)
+    print("이미지 저장 완료 : ", generated_image_path)
+
+    return generated_image_name
+
+
 
 def make_gpt(animal_name):
     openai.api_key = key

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>LITTLE TALES</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -78,34 +79,102 @@
         .color-button:focus {
             box-shadow: 0 0 0 2px white, 0 0 0 4px black; /* 선택된 버튼을 강조하기 위한 외곽선 */
         }
+
+        /* 로딩 스피너 스타일 */
+        .loading-overlay {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .loading-overlay img {
+            width: 300px;
+            height: 250px;
+        }
+        .loading-spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-overlay.active {
+            display: flex; /* display를 flex로 변경하여 보여줍니다. */
+        }
+        #submitImage {
+        width: 100px; /* 원하는 크기로 조절 */
+        height: auto; /* 높이를 자동으로 조절하여 비율 유지 */
+        cursor: pointer;
+        transform: rotate(-90deg); /* 90도 반시계 방향으로 뒤집음 */
+        }
+        .resultContainer {
+            background-color: white; /* 배경을 하얀색으로 설정 */
+            border: 5px solid #000; /* 테두리 두께와 색상 설정 */
+            border-radius: 15px; /* 네모의 모서리 둥글게 처리 */
+            display: flex; /* Flexbox를 사용하여 가운데 정렬 설정 */
+            justify-content: center; /* 수평 가운데 정렬 */
+            align-items: center; /* 수직 가운데 정렬 */
+            padding: 10px; /* 테두리와 이미지 사이의 간격 */
+            margin: 0 auto; /* 가운데 정렬 */
+            overflow: hidden; /* 넘치는 부분 숨김 */
+            text-align: center; /* 이미지를 가운데에 위치 */
+            cursor: pointer;
+            transition: transform 0.2s;
+            flex-direction: column;
+            font-family: 'CookieRun';
+            font-weight: bold;
+            font-size: 20px;
+            margin: 10px 0;
+            width:400px;
+        }
+        .resultContainer:hover {
+            transform: scale(1.1);
+        }
+
+        #successButton {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
     </style>
 </head>
 <body>
-    <div class="container">
+    <div id="canvascontainer" class="container">
         <p>선택한 동물 : {{ animal_name }}</p>
         <div class="controls">
             <!-- 색상 선택기 -->
-            <label for="colorPicker">Color:</label>
+            <label for="colorPicker">색상 선택</label>
             <input type="color" id="colorPicker" value="#000000">
 
             <!-- 버킷 페인트 (전체 캔버스 채우기) -->
-            <button onclick="useBucketFill()">Bucket Fill</button>
+            <button onclick="useBucketFill()">전체 채우기</button>
 
             <!-- 경로 따라 채우기 -->
-            <button onclick="fillAlongPath()">Fill Along Path</button>
+            <button onclick="fillAlongPath()">경로 채우기</button>
 
             <!-- 지우개 도구 -->
-            <button onclick="useEraser()">Eraser</button>
+            <button onclick="useEraser()">지우개</button>
 
             <!-- 되돌리기 / 다시하기 -->
-            <button onclick="undo()">Undo</button>
-            <button onclick="redo()">Redo</button>
+            <button onclick="undo()">되돌리기</button>
+            <button onclick="redo()">다시하기</button>
 
             <!-- 캔버스 초기화 -->
-            <button onclick="clearCanvas()">Clear</button>
+            <button onclick="clearCanvas()">전체 지우기</button>
 
-            <!-- 이미지 업로드 -->
-            <button onclick="uploadImage()">Upload Image</button>
+            <button onclick="uploadImage()">제출하기</button>
 
             <div class="color-palette">
                 <button class="color-button" style="background-color: black;" onclick="changeColor('#000000')"></button>
@@ -122,9 +191,34 @@
         </div>
         <canvas id="drawingCanvas" width="500" height="500" style="border:1px solid #000;"></canvas>
     </div>
+
+    <div id="successButton" style="display: none;">
+        <div id="resultContainer" class="resultContainer">
+            <div id="result"></div>
+            <form id="readForm" action="{{ url_for('littleread.read_index') }}" method="post">
+                <input type="hidden" name="animal" id="animalInput">
+                <input type="hidden" name="image" id="imageInput">
+                <input type="image" src="{{ url_for('static', filename='continue_button.png') }}" id="submitImage" alt="전송" />
+{#                <input type="submit" id="submitImage" value="전송" />#}
+            </form>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <img src="{{ url_for('static', filename='cat_loading.gif') }}" alt="로딩 중">
+    </div>
+
+
     <script>
+
         const canvas = document.getElementById("drawingCanvas");
         const ctx = canvas.getContext("2d");
+
+        document.addEventListener("DOMContentLoaded", function() {
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        });
+
         let painting = false;
         let color = "#000000";
         let usingEraser = false;
@@ -241,28 +335,91 @@
             usingEraser = true;
         }
 
-        function uploadImage() {
-            const canvas = document.getElementById("drawingCanvas");
-            const image = canvas.toDataURL("image/png");
+        document.getElementById("animalInput").value = "{{ animal_name }}";
 
-            fetch("/littledraw/upload_image", {
-                method: "POST",
+        function sendData() {
+            let animalName = document.getElementById('animalInput').value;
+            let image = canvas.toDataURL("image/png");
+
+            // POST 요청으로 데이터 전송
+            fetch('/littleread', {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json"
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    image: image,
-                    animal_name: "{{ animal_name }}"
+                    animal_name: animalName,
+                    image: image
                 })
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Image uploaded:", data.message);
-            })
-            .catch(error => {
-                console.error("Error uploading image:", error);
+            .then(response => response.text())
+            .then(data => document.body.innerHTML = data)
+            .catch(error => console.error('Error:', error));
+        }
+
+        function uploadImage() {
+            let formData = new FormData();
+
+            // 로딩 스피너 표시
+            showLoading();
+
+            $.ajax({
+                url: "{{ url_for('littleimage.image_check') }}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    $("#canvascontainer").hide(); // 업로드 컨테이너 숨기기
+                    $("#successButton").show(); // 전송 버튼 보여주기
+                    $("#result").html("판별 결과: " + response.result);
+                    hideLoading();
+                },
+                error: function(xhr, status, error) {
+                    $("#result").html("에러 발생: " + error);
+                    hideLoading();
+                }
             });
         }
+
+        // 로딩 스피너 표시 함수
+        function showLoading() {
+            $("#loadingOverlay").addClass("active"); // 로딩 스피너 보여주기
+        }
+
+        // 로딩 스피너 숨김 함수
+        function hideLoading() {
+            $("#loadingOverlay").removeClass("active"); // 로딩 스피너 숨기기
+        }
+
+        // Canvas에서 그림 데이터를 가져오는 함수
+        function getCanvasData() {
+            // 현재 canvas의 내용을 저장
+            var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+            // canvas를 흰색으로 채움
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 원래의 이미지 데이터를 다시 그림
+            ctx.putImageData(imageData, 0, 0);
+
+            return canvas.toDataURL("image/png"); // PNG 형식의 데이터 URL을 반환합니다.
+        }
+
+        document.getElementById("submitImage").addEventListener("click", function(event) {
+            const canvasData = getCanvasData();
+            document.getElementById("imageInput").value = canvasData; // hidden input에 데이터 URL을 설정합니다.
+        });
+
+        document.getElementById('readForm').addEventListener('submit', function(event) {
+            // 로딩 오버레이 표시
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            // 폼은 자동으로 제출될 것이므로 별도의 처리는 필요 없습니다.
+            // 만약 AJAX를 사용하여 제출한다면, 제출 후에 로딩 오버레이를 숨기는 코드도 필요하겠지만,
+            // 현재 코드에서는 그런 처리가 필요 없어 보입니다.
+        });
 
     </script>
 </body>
