@@ -1,7 +1,7 @@
 import base64
 import os
 from flask import Blueprint, request, render_template, jsonify
-from littletales.gpt_function.check_drawing import chat_drawing_check
+from littletales.gpt_function.Fail_check_drawing import chat_drawing_check
 
 
 bp = Blueprint('littledraw', __name__, url_prefix='/littledraw')
@@ -36,11 +36,11 @@ def upload_image():
         with open(image_path, "wb") as image_file:
             image_file.write(base64.b64decode(image_data))
 
-    a=chat_drawing_check(animal_name,result_image_path)
-    if a:
-        print("잘그림")
-    else:
-        print("못그림")
+    # a=chat_drawing_check(animal_name,result_image_path)
+    # if a:
+    #     print("잘그림")
+    # else:
+    #     print("못그림")
 
 
     return jsonify({"message": "Image uploaded successfully."}), 200

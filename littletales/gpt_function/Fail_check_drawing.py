@@ -45,22 +45,16 @@ def few_shot_prompting(input_target):
     return animals_list
 
 
-def drawing_classification(image_path, animals_list):
+def chat_drawing_check(user_input_text,image_path):
+    animals_list= few_shot_prompting(user_input_text)
 
-    ## Clip 전처리
     animal_list=["a picture of a "+ animal.strip() for animal in animals_list]
-    ##
-    # image_path="littletales/uploads/개.png"
-    # print(f"이미지 경로 :{image_path}")
-
-    ## Clip으로 그림 잘 그려졌는지 판별
     image=Image.open(image_path)
     
-    inputs = processor(text=animals_list, images=image, return_tensors="pt", padding=True)
+    inputs = processor(text=animal_list, images=image, return_tensors="pt", padding=True)
     outputs = model(**inputs)
     logits_per_image = outputs.logits_per_image 
     probs = logits_per_image.softmax(dim=1) 
-    
 
     ## Clip 결과 값 후처리
     value_list = probs.tolist()[0]
@@ -68,14 +62,8 @@ def drawing_classification(image_path, animals_list):
     result= max(value_list)
     reulst_index = value_list.index(result)  # reulst_index - 4 : 올바른 그림 / 나머지는 잘못그림
     print(f"당신의 그림은 {animals_list[reulst_index]}와 더 비슷합니다")
-    return reulst_index
 
-
-def chat_drawing_check(user_input_text,image_path):
-    animals_list= few_shot_prompting(user_input_text)
-    check_picture=drawing_classification(image_path,animals_list)
-
-    if check_picture==4:
+    if reulst_index==4:
         return True
     else:
         return False

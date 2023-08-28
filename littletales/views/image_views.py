@@ -10,8 +10,8 @@ from rembg import remove
 #필요 없음
 #from transformers import GPT2Tokenizer
 import json
-from littletales.gpt_function.check_drawing import chat_drawing_check
-
+from littletales.gpt_function.make_title_GPT import make_title
+make_title
 #플라스크 부분은 주석처리 해 둠
 #from flask import Blueprint
 #from matplotlib import pyplot as plt
@@ -86,11 +86,9 @@ def image_index() :
 @bp.route('/image_check', methods=['POST'])
 def image_check() :
     image_path='littletales/generated/generated_image.png'
-    if chat_drawing_check(animal_name,image_path):
-        response="잘 그림"
-    else:
-        response="못 그림"
-
+    make_title_json=make_title(animal_name)
+    response =make_title_json
+    print(make_title_json)
     return response
 
 # # GPT-2 토크나이저 로드
