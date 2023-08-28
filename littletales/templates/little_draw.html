@@ -116,36 +116,28 @@
         width: 100px; /* 원하는 크기로 조절 */
         height: auto; /* 높이를 자동으로 조절하여 비율 유지 */
         cursor: pointer;
-        transform: rotate(-90deg); /* 90도 반시계 방향으로 뒤집음 */
+        {#transform: rotate(-90deg); /* 90도 반시계 방향으로 뒤집음 */#}
         }
         .resultContainer {
             background-color: white; /* 배경을 하얀색으로 설정 */
             border: 5px solid #000; /* 테두리 두께와 색상 설정 */
             border-radius: 15px; /* 네모의 모서리 둥글게 처리 */
             display: flex; /* Flexbox를 사용하여 가운데 정렬 설정 */
-            justify-content: center; /* 수평 가운데 정렬 */
             align-items: center; /* 수직 가운데 정렬 */
             padding: 10px; /* 테두리와 이미지 사이의 간격 */
             margin: 0 auto; /* 가운데 정렬 */
             overflow: hidden; /* 넘치는 부분 숨김 */
             text-align: center; /* 이미지를 가운데에 위치 */
-            cursor: pointer;
             transition: transform 0.2s;
             flex-direction: column;
             font-family: 'CookieRun';
             font-weight: bold;
             font-size: 20px;
-            margin: 10px 0;
+            margin: 20px;
             width:400px;
         }
         .resultContainer:hover {
             transform: scale(1.1);
-        }
-
-        #successButton {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
         }
 
     </style>
@@ -193,14 +185,42 @@
     </div>
 
     <div id="successButton" style="display: none;">
-        <div id="resultContainer" class="resultContainer">
-            <div id="result"></div>
+        <div id="flexButton" style="display: flex;">
+        <div class="resultContainer">
             <form id="readForm" action="{{ url_for('littleread.read_index') }}" method="post">
-                <input type="hidden" name="animal" id="animalInput">
-                <input type="hidden" name="image" id="imageInput">
-                <input type="image" src="{{ url_for('static', filename='continue_button.png') }}" id="submitImage" alt="전송" />
-{#                <input type="submit" id="submitImage" value="전송" />#}
+                <div id="result1"></div>
+                <input type="hidden" name="animal" id="animalInput_1">
+                <input type="hidden" name="image" id="imageInput_1">
+                <input type="hidden" name="title" id="titleInput_1">
+                <input type="hidden" name="plot" id="plotInput_1">
+{#                <input type="image" src="{{ url_for('static', filename='continue_button.png') }}" id="submitImage" alt="전송" />#}
+                <input type="submit" id="submitImage" value="전송" />
             </form>
+        </div>
+
+        <div class="resultContainer">
+            <form id="readForm" action="{{ url_for('littleread.read_index') }}" method="post">
+                <div id="result2"></div>
+                <input type="hidden" name="animal" id="animalInput_2">
+                <input type="hidden" name="image" id="imageInput_2">
+                <input type="hidden" name="title" id="titleInput_2">
+                <input type="hidden" name="plot" id="plotInput_2">
+{#                <input type="image" src="{{ url_for('static', filename='continue_button.png') }}" id="submitImage" alt="전송" />#}
+                <input type="submit" id="submitImage" value="전송" />
+            </form>
+        </div>
+
+        <div class="resultContainer">
+            <form id="readForm" action="{{ url_for('littleread.read_index') }}" method="post">
+                <div id="result3"></div>
+                <input type="hidden" name="animal" id="animalInput_3">
+                <input type="hidden" name="image" id="imageInput_3">
+                <input type="hidden" name="title" id="titleInput_3">
+                <input type="hidden" name="plot" id="plotInput_3">
+{#                <input type="image" src="{{ url_for('static', filename='continue_button.png') }}" id="submitImage" alt="전송" />#}
+                <input type="submit" id="submitImage" value="전송" />
+            </form>
+        </div>
         </div>
     </div>
 
@@ -335,7 +355,9 @@
             usingEraser = true;
         }
 
-        document.getElementById("animalInput").value = "{{ animal_name }}";
+        document.getElementById("animalInput_1").value = "{{ animal_name }}";
+        document.getElementById("animalInput_2").value = "{{ animal_name }}";
+        document.getElementById("animalInput_3").value = "{{ animal_name }}";
 
         function sendData() {
             let animalName = document.getElementById('animalInput').value;
@@ -358,7 +380,7 @@
         }
 
         function uploadImage() {
-            let formData = new FormData();
+            let animalName = document.getElementById('animalInput_1').value;
 
             // 로딩 스피너 표시
             showLoading();
@@ -366,17 +388,27 @@
             $.ajax({
                 url: "{{ url_for('littleimage.image_check') }}",
                 type: "POST",
-                data: formData,
+                data: JSON.stringify({ animalName: animalName }),
                 processData: false,
-                contentType: false,
+                contentType: "application/json",
                 success: function(response) {
                     $("#canvascontainer").hide(); // 업로드 컨테이너 숨기기
                     $("#successButton").show(); // 전송 버튼 보여주기
-                    $("#result").html("판별 결과: " + response);
+                    $("#result1").html("제목 : " + response[0][0] + "\r\n" + "내용 : " + response[1][0]);
+                    document.getElementById("titleInput_1").value = response[0][0];
+                    document.getElementById("plotInput_1").value = response[1][0];
+                    $("#result2").html("제목 : " + response[0][1] + "\r\n" + "내용 : " + response[1][1]);
+                    document.getElementById("titleInput_2").value = response[0][1];
+                    document.getElementById("plotInput_2").value = response[1][1];
+                    $("#result3").html("제목 : " + response[0][2] + "\r\n" + "내용 : " + response[1][2]);
+                    document.getElementById("titleInput_3").value = response[0][2];
+                    document.getElementById("plotInput_3").value = response[1][2];
                     hideLoading();
                 },
                 error: function(xhr, status, error) {
-                    $("#result").html("에러 발생: " + error);
+                    $("#result1").html("에러 발생: " + error);
+                    $("#result2").html("에러 발생: " + error);
+                    $("#result3").html("에러 발생: " + error);
                     hideLoading();
                 }
             });

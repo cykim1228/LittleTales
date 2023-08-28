@@ -11,7 +11,7 @@ from rembg import remove
 #from transformers import GPT2Tokenizer
 import json
 from littletales.gpt_function.make_title_GPT import make_title
-make_title
+
 #플라스크 부분은 주석처리 해 둠
 #from flask import Blueprint
 #from matplotlib import pyplot as plt
@@ -85,10 +85,14 @@ def image_index() :
 
 @bp.route('/image_check', methods=['POST'])
 def image_check() :
-    image_path='littletales/generated/generated_image.png'
-    make_title_json=make_title(animal_name)
-    response =make_title_json
-    print(make_title_json)
+    data = request.get_json()  # 요청의 JSON 데이터를 파싱
+    animal_name = data['animalName']
+
+    print("이미지뷰 동물 : ", animal_name)
+    response = make_title(animal_name)
+
+    print("주제 3개 만듦 : ", response)
+
     return response
 
 # # GPT-2 토크나이저 로드

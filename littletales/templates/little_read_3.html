@@ -102,17 +102,17 @@
     <div class="image-container">
         <!-- 이미지 출력을 위한 컨테이너 -->
 {#        <img src="{{ url_for('static', filename='animal_chicken.png') }}" alt="이미지">#}
-        <img src="{{ url_for('main.generated_file', filename=image_response) }}" alt="Generated Image" width="500">
+        <img src="{{ url_for('main.generated_file', filename=image_response3) }}" alt="Generated Image" width="500">
     </div>
     <div class="read-container">
         <!-- 텍스트 출력을 위한 컨테이너 -->
-        <h3 class="mt-5" style="display: none;">생성 동화</h3>
-        <p id="chat-text" style="display: none;">{{ chat_response }}</p>
+        <h3 class="mt-5">{{ title_response3 }}</h3>
+        <p id="chat-text" style="display: none;">{{ chat_response3 }}</p>
         <p id="visible-text"></p>
     </div>
 </div>
 
-<button id="nextButton" onclick="showNext()">다음</button>
+<button onclick="location.href='/littleread/read_four'">다음</button>
 
 
 <script>
@@ -143,12 +143,6 @@
         }
 
         showNextLine();
-
-        // 다음 버튼을 클릭하면 버튼을 다시 숨기고 showNext 함수를 호출합니다.
-        $("#nextButton").click(function() {
-            $(this).hide();
-            showNext();
-        });
 
     });
 

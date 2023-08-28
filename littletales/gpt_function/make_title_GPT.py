@@ -211,6 +211,7 @@ def make_story(target,title,plot):
         )
 
     make_title = chat_completion.choices[0].message.content  ## gpt결과값 출력
+    make_title_json = json.loads(make_title)
 
     subtitle=[]
     content=[]

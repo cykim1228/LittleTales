@@ -22,6 +22,7 @@ import dotenv
 from flask import Blueprint, request, render_template, jsonify, session
 from rembg import remove
 from base64 import decodebytes
+from littletales.gpt_function.make_title_GPT import make_story
 
 bp = Blueprint('littleread', __name__, url_prefix='/littleread')
 
@@ -66,6 +67,16 @@ def read_index() :
 
     animal_name = request.form['animal']
     image_data_url = request.form['image']
+    target = animal_name
+    title = request.form['title']
+    plot = request.form['plot']
+
+    result_list = make_story(target, title, plot)
+
+    print('결과 값 : ', result_list)
+
+    backgrounds = [result_list[2][0], result_list[2][1], result_list[2][2]]
+    images = []
 
     header, image_data_base64 = image_data_url.split(',', 1)
     image_data = base64.b64decode(image_data_base64)
@@ -84,7 +95,11 @@ def read_index() :
     with open(generated_image_path, "rb") as f:
         actual_image_data = f.read()
 
-    image_response = gen_image(actual_image_data)
+    for background in backgrounds:
+        image_name = gen_image(actual_image_data, background)
+        images.append(image_name)
+
+    image_response = images
 
     chat_response = None
 
@@ -97,14 +112,76 @@ def read_index() :
     print('이미지 경로 : ', image_response)
 
     session['animal_name'] = animal_name
-    session['chat_response'] = chat_response
-    session['image_response'] = image_response
+
+    session['title_response1'] = result_list[0][0]
+    session['title_response2'] = result_list[0][1]
+    session['title_response3'] = result_list[0][2]
+    # session['title_response4'] = result_list[0][3]
+
+    session['chat_response1'] = result_list[1][0]
+    session['chat_response2'] = result_list[1][1]
+    session['chat_response3'] = result_list[1][2]
+    # session['chat_response4'] = result_list[1][3]
+
+    session['place_response1'] = result_list[2][0]
+    session['place_response2'] = result_list[2][1]
+    session['place_response3'] = result_list[2][2]
+    # session['place_response4'] = result_list[2][3]
+
+    session['image_response1'] = image_response[0]
+    session['image_response2'] = image_response[1]
+    session['image_response3'] = image_response[2]
+    # session['image_response4'] = image_response[3]
+
+    title_response1 = result_list[0][0]
+    chat_response1 = result_list[1][0]
+    place_response1 = result_list[2][0]
+    image_response1 = image_response[0]
+
+    return render_template('little_read_1.html', animal_name=animal_name, title_response1=title_response1, chat_response1=chat_response1, place_response1=place_response1, image_response1=image_response1)
 
 
-    return render_template('little_read.html', animal_name=animal_name, chat_response=chat_response, image_response=image_response)
+@bp.route('/read_one')
+def read_one() :
 
+    image_response1 = session.get('image_response1')
+    chat_response1 = session.get('chat_response1')
+    title_response1 = session.get('title_response1')
+    place_response1 = session.get('place_response1')
 
-def gen_image(image_data) :
+    return render_template('little_read_1.html', title_response1=title_response1, chat_response1=chat_response1, place_response1=place_response1, image_response1=image_response1)
+
+@bp.route('/read_two')
+def read_two() :
+
+    image_response2 = session.get('image_response2')
+    chat_response2 = session.get('chat_response2')
+    title_response2 = session.get('title_response2')
+    place_response2 = session.get('place_response2')
+
+    return render_template('little_read_2.html', title_response2=title_response2, chat_response2=chat_response2, place_response2=place_response2, image_response2=image_response2)
+
+@bp.route('/read_three')
+def read_three() :
+
+    image_response3 = session.get('image_response3')
+    chat_response3 = session.get('chat_response3')
+    title_response3 = session.get('title_response3')
+    place_response3 = session.get('place_response3')
+
+    return render_template('little_read_3.html', title_response3=title_response3, chat_response3=chat_response3, place_response3=place_response3, image_response3=image_response3)
+
+@bp.route('/read_four')
+def read_four() :
+
+    image_response4 = session.get('image_response4')
+    chat_response4 = session.get('chat_response4')
+    title_response4 = session.get('title_response4')
+    place_response4 = session.get('place_response4')
+
+    return render_template('little_read_4.html', title_response4=title_response4, chat_response4=chat_response4, place_response4=place_response4, image_response4=image_response4)
+
+def gen_image(image_data, background) :
     # 이미지 데이터를 PIL.Image 형식으로 열기
     image = Image.open(io.BytesIO(image_data))
     print("이미지 불러오기 완료")
@@ -118,7 +195,8 @@ def gen_image(image_data) :
     output.save(rembg_path)
     print("배경제거된 이미지 저장 완료 : ", rembg_path)
 
-    prompt = "depict the background as a fairy tale with the characteristics of the painting "
+    # 주어진 배경 키워드를 사용하여 프롬프트를 설정
+    prompt = f"depict the background as a {background} fairy tale with the characteristics of the painting"
     print("프롬프트 입력 완료 : ", prompt)
 
     # 이미지 생성
@@ -134,7 +212,9 @@ def gen_image(image_data) :
     print("이미지 생성 완료 : ", image_url)
 
     # 생성된 이미지 다운로드 및 저장
-    generated_image_name = 'generated_image.png'
+    from datetime import datetime
+    current_time = datetime.now().strftime("%Y%m%d%H%M%S")
+    generated_image_name = f'generated_image_{background}_{current_time}.png'
     generated_image_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'generated', generated_image_name)
     image_response = requests.get(image_url)
     with open(generated_image_path, "wb") as f:
