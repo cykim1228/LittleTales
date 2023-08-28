@@ -4,9 +4,22 @@
     <meta charset="UTF-8">
     <title>LITTLE TALES</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://webfontworld.github.io/cookierun/CookieRun.css" rel="stylesheet">
     <style>
+
+        @import url('https://fonts.googleapis.com/css?family=Rubik:700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            &::before, &::after {
+                box-sizing: border-box;
+            }
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'CookieRun';
+            font-weight: bold;
+            font-size: 20px;
             margin: 0;
             padding: 0;
             display: flex;
@@ -140,6 +153,62 @@
             transform: scale(1.1);
         }
 
+        button {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            outline: none;
+            border: 0;
+            vertical-align: middle;
+            text-decoration: none;
+            font-family: 'CookieRun';
+            &.learn-more {
+                font-weight: bold;
+                font-size: 20px;
+                margin-top: 10px;
+                margin-bottom: 20px;
+                color: #382b22;
+                text-transform: uppercase;
+                padding: 1.25em 2em;
+                background: #fff0f0;
+                border: 2px solid #b18597;
+                border-radius: 0.75em;
+                transform-style: preserve-3d;
+                transition: transform 150ms cubic-bezier(0, 0, 0.58, 1), background 150ms cubic-bezier(0, 0, 0.58, 1);
+                &::before {
+                    position: absolute;
+                    content: '';
+                    width: 100%;
+                    height: 100%;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: #f9c4d2;
+                    border-radius: inherit;
+                    box-shadow: 0 0 0 2px #b18597;, 0 0.625em 0 0 #ffe3e2;
+                    transform: translate3d(0, 0.75em, -1em);
+                    transition: transform 150ms cubic-bezier(0, 0, 0.58, 1), box-shadow 150ms cubic-bezier(0, 0, 0.58, 1);
+                }
+                &:hover {
+                    background: #ffe9e9;
+                    transform: translate(0, 0.25em);
+                    &::before {
+                        box-shadow: 0 0 0 2px #b18597;, 0 0.5em 0 0 #ffe3e2;
+                        transform: translate3d(0, 0.5em, -1em);
+                    }
+                }
+                &:active {
+                    background: #ffe9e9;
+                    transform: translate(0em, 0.75em);
+                    &::before {
+                        box-shadow: 0 0 0 2px #b18597;, 0 0 #ffe3e2;
+                        transform: translate3d(0, 0, -1em);
+                    }
+                }
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -187,38 +256,39 @@
     <div id="successButton" style="display: none;">
         <div id="flexButton" style="display: flex;">
         <div class="resultContainer">
-            <form id="readForm" action="{{ url_for('littleread.read_index') }}" method="post">
+            <form id="readForm1" action="{{ url_for('littleread.read_index') }}" method="post">
                 <div id="result1"></div>
                 <input type="hidden" name="animal" id="animalInput_1">
                 <input type="hidden" name="image" id="imageInput_1">
                 <input type="hidden" name="title" id="titleInput_1">
                 <input type="hidden" name="plot" id="plotInput_1">
 {#                <input type="image" src="{{ url_for('static', filename='continue_button.png') }}" id="submitImage" alt="전송" />#}
-                <input type="submit" id="submitImage" value="전송" />
+{#                <input type="submit" id="submitImage1" value="전송" />#}
+                <button type="submit" id="submitImage1" class="learn-more">이거로!</button>
             </form>
         </div>
 
         <div class="resultContainer">
-            <form id="readForm" action="{{ url_for('littleread.read_index') }}" method="post">
+            <form id="readForm2" action="{{ url_for('littleread.read_index') }}" method="post">
                 <div id="result2"></div>
                 <input type="hidden" name="animal" id="animalInput_2">
                 <input type="hidden" name="image" id="imageInput_2">
                 <input type="hidden" name="title" id="titleInput_2">
                 <input type="hidden" name="plot" id="plotInput_2">
 {#                <input type="image" src="{{ url_for('static', filename='continue_button.png') }}" id="submitImage" alt="전송" />#}
-                <input type="submit" id="submitImage" value="전송" />
+                <button type="submit" id="submitImage2" class="learn-more">이거로!</button>
             </form>
         </div>
 
         <div class="resultContainer">
-            <form id="readForm" action="{{ url_for('littleread.read_index') }}" method="post">
+            <form id="readForm3" action="{{ url_for('littleread.read_index') }}" method="post">
                 <div id="result3"></div>
                 <input type="hidden" name="animal" id="animalInput_3">
                 <input type="hidden" name="image" id="imageInput_3">
                 <input type="hidden" name="title" id="titleInput_3">
                 <input type="hidden" name="plot" id="plotInput_3">
 {#                <input type="image" src="{{ url_for('static', filename='continue_button.png') }}" id="submitImage" alt="전송" />#}
-                <input type="submit" id="submitImage" value="전송" />
+                <button type="submit" id="submitImage3" class="learn-more">이거로!</button>
             </form>
         </div>
         </div>
@@ -394,13 +464,13 @@
                 success: function(response) {
                     $("#canvascontainer").hide(); // 업로드 컨테이너 숨기기
                     $("#successButton").show(); // 전송 버튼 보여주기
-                    $("#result1").html("제목 : " + response[0][0] + "\r\n" + "내용 : " + response[1][0]);
+                    $("#result1").html("제목 : " + response[0][0] + "<br><br>" + "내용 : " + response[1][0] + "<br>");
                     document.getElementById("titleInput_1").value = response[0][0];
                     document.getElementById("plotInput_1").value = response[1][0];
-                    $("#result2").html("제목 : " + response[0][1] + "\r\n" + "내용 : " + response[1][1]);
+                    $("#result2").html("제목 : " + response[0][1] + "<br><br>" + "내용 : " + response[1][1] + "<br>");
                     document.getElementById("titleInput_2").value = response[0][1];
                     document.getElementById("plotInput_2").value = response[1][1];
-                    $("#result3").html("제목 : " + response[0][2] + "\r\n" + "내용 : " + response[1][2]);
+                    $("#result3").html("제목 : " + response[0][2] + "<br><br>" + "내용 : " + response[1][2] + "<br>");
                     document.getElementById("titleInput_3").value = response[0][2];
                     document.getElementById("plotInput_3").value = response[1][2];
                     hideLoading();
@@ -439,18 +509,28 @@
             return canvas.toDataURL("image/png"); // PNG 형식의 데이터 URL을 반환합니다.
         }
 
-        document.getElementById("submitImage").addEventListener("click", function(event) {
-            const canvasData = getCanvasData();
-            document.getElementById("imageInput").value = canvasData; // hidden input에 데이터 URL을 설정합니다.
+        document.getElementById("submitImage1").addEventListener("click", function(event) {
+            document.getElementById("imageInput_1").value = getCanvasData(); // hidden input에 데이터 URL을 설정합니다.
         });
 
-        document.getElementById('readForm').addEventListener('submit', function(event) {
-            // 로딩 오버레이 표시
-            document.getElementById('loadingOverlay').style.display = 'flex';
+        document.getElementById("submitImage2").addEventListener("click", function(event) {
+            document.getElementById("imageInput_2").value = getCanvasData();
+        });
 
-            // 폼은 자동으로 제출될 것이므로 별도의 처리는 필요 없습니다.
-            // 만약 AJAX를 사용하여 제출한다면, 제출 후에 로딩 오버레이를 숨기는 코드도 필요하겠지만,
-            // 현재 코드에서는 그런 처리가 필요 없어 보입니다.
+        document.getElementById("submitImage3").addEventListener("click", function(event) {
+            document.getElementById("imageInput_3").value = getCanvasData();
+        });
+
+        document.getElementById('readForm1').addEventListener('submit', function(event) {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        });
+
+        document.getElementById('readForm2').addEventListener('submit', function(event) {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        });
+
+        document.getElementById('readForm3').addEventListener('submit', function(event) {
+            document.getElementById('loadingOverlay').style.display = 'flex';
         });
 
     </script>

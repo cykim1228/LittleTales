@@ -65,6 +65,10 @@ openai.Model.list()
 @bp.route('/', methods=['POST'])
 def read_index() :
 
+    print('리퀘스트 : ', request)
+    print('리퀘스트 키워드 : ', request.form['animal'])
+    print('리퀘스트 이미지 : ', request.form.get('image'))
+
     animal_name = request.form['animal']
     image_data_url = request.form['image']
     target = animal_name

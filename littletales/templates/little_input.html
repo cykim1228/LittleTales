@@ -4,7 +4,18 @@
     <meta charset="UTF-8">
     <title>LITTLE TALES</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://webfontworld.github.io/cookierun/CookieRun.css" rel="stylesheet">
     <style>
+
+        @import url('https://fonts.googleapis.com/css?family=Rubik:700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            &::before, &::after {
+                box-sizing: border-box;
+            }
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -62,16 +73,160 @@
             width: 350px; /* 로고 이미지의 너비 설정 */
             height: 350px; /* 높이는 자동 조절 */
         }
+
+        .input-container {
+            background-color: white;
+            border: 5px solid #000;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            width: 700px;
+            margin: 0 auto;
+            overflow: hidden;
+            text-align: center;
+            position: relative;
+            margin-top: 20px; /* 위로 50px 간격 설정 */
+            margin-bottom: 20px; /* 아래로 50px 간격 설정 */
+            flex-direction: column;
+            font-family: 'CookieRun';
+            font-weight: bold;
+            font-size: 10px;
+        }
+        input {
+            font-size: 30px;
+            color: #222222;
+            width: 400px;
+            border: none;
+            border-bottom: solid #aaaaaa 1px;
+            padding-bottom: 10px;
+            padding-left: 10px;
+            position: relative;
+            background: none;
+            z-index: 5;
+        }
+
+        input::placeholder { color: #aaaaaa; }
+        input:focus { outline: none; }
+
+        span {
+            display: block;
+            position: absolute;
+            bottom: 0;
+            left: 0%;  /* right로만 바꿔주면 오 - 왼 */
+            background-color: #666;
+            width: 0;
+            height: 2px;
+            border-radius: 2px;
+            transition: 0.5s;
+        }
+
+        label {
+            position: absolute;
+            color: #aaa;
+            left: 10px;
+            font-size: 20px;
+            bottom: 8px;
+            transition: all .2s;
+        }
+
+        input:focus ~ label, input:valid ~ label {
+            font-size: 16px;
+            bottom: 60px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        input:focus ~ span, input:valid ~ span {
+            width: 100%;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .input-container-div {
+            position: relative;
+            width: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+        }
+
+        button {
+            position: relative;
+            display: inline-block;
+            margin-top: 30px;
+            cursor: pointer;
+            outline: none;
+            border: 0;
+            vertical-align: middle;
+            text-decoration: none;
+            font-family: 'CookieRun';
+            &.learn-more {
+                font-weight: bold;
+                font-size: 26px;
+                color: #382b22;
+                text-transform: uppercase;
+                padding: 1.25em 2em;
+                background: #fff0f0;
+                border: 2px solid #b18597;
+                border-radius: 0.75em;
+                transform-style: preserve-3d;
+                transition: transform 150ms cubic-bezier(0, 0, 0.58, 1), background 150ms cubic-bezier(0, 0, 0.58, 1);
+                &::before {
+                    position: absolute;
+                    content: '';
+                    width: 100%;
+                    height: 100%;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: #f9c4d2;
+                    border-radius: inherit;
+                    box-shadow: 0 0 0 2px #b18597;, 0 0.625em 0 0 #ffe3e2;
+                    transform: translate3d(0, 0.75em, -1em);
+                    transition: transform 150ms cubic-bezier(0, 0, 0.58, 1), box-shadow 150ms cubic-bezier(0, 0, 0.58, 1);
+                }
+                &:hover {
+                    background: #ffe9e9;
+                    transform: translate(0, 0.25em);
+                    &::before {
+                        box-shadow: 0 0 0 2px #b18597;, 0 0.5em 0 0 #ffe3e2;
+                        transform: translate3d(0, 0.5em, -1em);
+                    }
+                }
+                &:active {
+                    background: #ffe9e9;
+                    transform: translate(0em, 0.75em);
+                    &::before {
+                        box-shadow: 0 0 0 2px #b18597;, 0 0 #ffe3e2;
+                        transform: translate3d(0, 0, -1em);
+                    }
+                }
+            }
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div class="input-container">
         <form id="inputForm" action="{{ url_for('littledraw.draw_canvas') }}" method="post">
-            <input type="text" name="animal" id="animal">
+            <div class="input-container-div">
+                <input type="text" name="animal" id="animal" style="font-family: 'CookieRun';" required>
+                <label>읽고 싶은 동화의 주인공을 작성해 주세요.</label>
+                <span></span>
+            </div>
             <!-- 이미지 버튼으로 대체 -->
 {#            <input type="image" src="{{ url_for('static', filename='continue_button.png') }}" id="submitImage" alt="전송" />#}
-            <input type="submit" value="전송" />
+            <button class="learn-more">확인</button>
         </form>
     </div>
 
