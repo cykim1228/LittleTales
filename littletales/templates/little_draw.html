@@ -372,7 +372,7 @@
                 success: function(response) {
                     $("#canvascontainer").hide(); // 업로드 컨테이너 숨기기
                     $("#successButton").show(); // 전송 버튼 보여주기
-                    $("#result").html("판별 결과: " + response.result);
+                    $("#result").html("판별 결과: " + response);
                     hideLoading();
                 },
                 error: function(xhr, status, error) {

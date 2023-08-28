@@ -10,6 +10,7 @@ from rembg import remove
 #필요 없음
 #from transformers import GPT2Tokenizer
 import json
+from littletales.gpt_function.check_drawing import chat_drawing_check
 
 #플라스크 부분은 주석처리 해 둠
 #from flask import Blueprint
@@ -25,6 +26,9 @@ dotenv.load_dotenv(dotenv_file)
 openai.organization = "org-jUejdT5GvU7fyKtp3IAwwin9"
 openai.api_key = os.getenv("OPENAI_API_KEY")
 openai.Model.list()
+
+animal_name=''
+image_path=''
 
 # 위 코드랑 중복되는 거라 일단 둘 중 뭐가 맞는 지 헷갈려서 주석처리
 # key = os.environ["OPENAI_API_KEY"]
@@ -81,8 +85,11 @@ def image_index() :
 
 @bp.route('/image_check', methods=['POST'])
 def image_check() :
-    print("잘그림")
-    response = "잘그림"
+    image_path='littletales/generated/generated_image.png'
+    if chat_drawing_check(animal_name,image_path):
+        response="잘 그림"
+    else:
+        response="못 그림"
 
     return response
 

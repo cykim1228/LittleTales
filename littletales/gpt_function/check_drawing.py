@@ -28,7 +28,9 @@ def few_shot_prompting(input_target):
             {"role": "user", "content": "하마와 다른 종류이며, 하마와 비슷하지 않는 동물 4마리를 알려주세요, 동물 이름들만 <,>로 구분해서 하마까지 추가하여 영어로 반환해주세요"},
             {"role": "assistant", "content": "Lion, Elephant, Giraffe, Monkey, Hippopotamus"},
             {"role": "user", "content": "강아지와 다른 종류이며, 강아지와 비슷하지 않는 동물 4마리를 알려주세요, 동물 이름들만 <,>로 구분해서 강아지까지 추가하여 영어로 반환해주세요"},
-            {"role": "assistant", "content": "Lion, Elephant, Monkey, Cat, Dog"},
+            {"role": "assistant", "content": "Tiger, fox, wolf, Cat, Dog"},
+            {"role": "user", "content": "고양이와 다른 종류이며, 고양이와 비슷하지 않는 동물 4마리를 알려주세요, 동물 이름들만 <,>로 구분해서 고양이까지 추가하여 영어로 반환해주세요"},
+            {"role": "assistant", "content": "Lion, puma, Cheetah, Dog, Cat"},
             {"role": "user", "content": input_text},
         ]
 
