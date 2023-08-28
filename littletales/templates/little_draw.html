@@ -96,12 +96,12 @@
         .color-options {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 5px;
         }
 
         .color-option {
-            width: 60px;
-            height: 60px;
+            width: 40px;
+            height: 40px;
             cursor: pointer;
             border-radius: 50%;
             border: 5px solid black;
@@ -109,7 +109,7 @@
         }
 
         .color-option:hover {
-            transform: scale(1.2);
+            transform: scale(1.8);
         }
 
         /* column no.2 canvas */
@@ -128,7 +128,6 @@
         .canvasBtns {
             display: flex;
             flex-direction: column;
-            gap: 20px;
         }
 
         /* 로딩 스피너 스타일 */
@@ -281,7 +280,7 @@
             border: 5px solid #000; /* 테두리 두께와 색상 설정 */
             border-radius: 15px; /* 네모의 모서리 둥글게 처리 */
             display: flex; /* Flexbox를 사용하여 가운데 정렬 설정 */
-            padding: 10px; /* 테두리와 이미지 사이의 간격 */
+            padding: 5px; /* 테두리와 이미지 사이의 간격 */
             margin: 0 auto; /* 가운데 정렬 */
             overflow: hidden; /* 넘치는 부분 숨김 */
             text-align: center; /* 이미지를 가운데에 위치 */
@@ -363,10 +362,6 @@
             <p>선 굵기</p>
             <input id="line-width" type="range" min="1" max="30" value="5" step="0.1"/>
         </div>
-{#        <label for="file">#}
-{#            <button class="learn-more">사진추가</button>#}
-{#            <input type="file" accept="image/*" id="file"/>#}
-{#        </label>#}
         <button onclick="onEraseClick()" id="eraser-btn" class="learn-more">지워 버려</button>
         <button onclick="onDestroyClick()" id="destroy-btn" class="learn-more">모두 파괴</button>
         <button onclick="onSaveClick()" id="save" class="learn-more">내 그림 소장</button>
@@ -425,6 +420,7 @@
             document.getElementById("animalInput_1").value = "{{ animal_name }}";
             document.getElementById("animalInput_2").value = "{{ animal_name }}";
             document.getElementById("animalInput_3").value = "{{ animal_name }}";
+            console.log(document.getElementById("animalInput_3").value)
         });
 
         const colorOptions = Array.from(
@@ -440,14 +436,11 @@
 
         const lineWidth = document.getElementById('line-width');
         const color = document.getElementById('color');
-        const modeBtn = document.getElementById('mode-btn');
         const destroyBtn = document.getElementById('destroy-btn');
         const eraserBtn = document.getElementById('eraser-btn');
-        const fileInput = document.getElementById('file');
-        const textInput = document.getElementById('text');
         const saveBtn = document.getElementById("save");
-        canvas.width = 800;
-        canvas.height = 800;
+        canvas.width = 600;
+        canvas.height = 600;
         ctx.lineWidth = lineWidth.value;
         let isPainting = false;
         let isFilling = false;
@@ -505,22 +498,6 @@
 
         colorOptions.forEach((colorOption) => colorOption.addEventListener("click", onColorClick))
 
-        // 그림판 전체 색상
-
-        function onCanvasClick() {
-            if (isFilling) {
-                ctx.fillRect(0,0, canvas.width, canvas.height)
-            }
-        }
-
-        function onModeClick() {
-            isFilling = false;
-            modeBtn.innerText = "Drawing Mode";
-        }
-
-        modeBtn.addEventListener("click", onModeClick)
-        canvas.addEventListener("click", onCanvasClick)
-
         // 전체 지우개
 
         function onDestroyClick() {
@@ -539,23 +516,6 @@
 
         eraserBtn.addEventListener("click", onEraseClick);
 
-        //밈 만들기
-
-        // 이미지 추가
-
-        function onFileChange(event) {
-            const file = event.target.files[0];
-            const url = URL.createObjectURL(file);
-            const image = new Image();
-            image.src = url;
-            image.onload = function () {
-                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-                fileInput.value = null;
-            };
-        }
-
-        fileInput.addEventListener("change", onFileChange);
-
         // 만든 이미지 저장하기
 
         function onSaveClick() {
@@ -567,26 +527,6 @@
         }
 
         saveBtn.addEventListener("click", onSaveClick);
-
-        function sendData() {
-            let animalName = document.getElementById('animalInput').value;
-            let image = canvas.toDataURL("image/png");
-
-            // POST 요청으로 데이터 전송
-            fetch('/littleread', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    animal_name: animalName,
-                    image: image
-                })
-            })
-            .then(response => response.text())
-            .then(data => document.body.innerHTML = data)
-            .catch(error => console.error('Error:', error));
-        }
 
         function uploadImage() {
             let animalName = document.getElementById('animalInput_1').value;
@@ -637,21 +577,16 @@
 
         // Canvas에서 그림 데이터를 가져오는 함수
         function getCanvasData() {
-            // 현재 canvas의 내용을 저장
-            var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+            var imageData = canvas.toDataURL("image/png"); // PNG 형식의 데이터 URL을 반환합니다.
 
-            // canvas를 흰색으로 채움
-            ctx.fillStyle = "white";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            console.log("etCanvasData 종료");
+            console.log("imageData" + imageData);
 
-            // 원래의 이미지 데이터를 다시 그림
-            ctx.putImageData(imageData, 0, 0);
-
-            return canvas.toDataURL("image/png"); // PNG 형식의 데이터 URL을 반환합니다.
+            return imageData;
         }
 
         document.getElementById("submitImage1").addEventListener("click", function(event) {
+            console.log("etCanvasData 시작");
             document.getElementById("imageInput_1").value = getCanvasData(); // hidden input에 데이터 URL을 설정합니다.
         });
 

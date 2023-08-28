@@ -107,9 +107,9 @@ def read_index() :
 
     chat_response = None
 
-    if animal_name:
+    # if animal_name:
         # chat_response = make_llama(animal_name)
-        chat_response = make_gpt(animal_name)
+        # chat_response = make_gpt(animal_name)
 
     print('키워드 : ', animal_name)
     print('생성 동화 : ', chat_response)
