@@ -76,21 +76,59 @@
             width: 350px; /* 로고 이미지의 너비 설정 */
             height: 350px; /* 높이는 자동 조절 */
         }
-        canvas {
-            border: 1px solid black;
-        }
-        .color-button {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%; /* 원형으로 만들기 위한 속성 */
-            border: none;
-            cursor: pointer;
-            margin-right: 10px;
-            outline: none;
+
+        /* column no.1 colors */
+
+        #colors {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-left: 100px;
         }
 
-        .color-button:focus {
-            box-shadow: 0 0 0 2px white, 0 0 0 4px black; /* 선택된 버튼을 강조하기 위한 외곽선 */
+        #color {
+            margin: 10px 0 ;
+            background-color: black;
+            border: none;
+            height: 50px;
+            width: 50px;
+        }
+        .color-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .color-option {
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 5px solid black;
+            transition: transform ease-in-out .3s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.2);
+        }
+
+        /* column no.2 canvas */
+
+        canvas {
+            border: 5px solid black;
+            margin-top: 5vh;
+            background-color: white;
+            border-radius: 15px;
+            margin-left: 20px; /* canvas 왼쪽 여백 추가 */
+            margin-right: 20px; /* canvas 오른쪽 여백 추가 */
+        }
+
+        /* column no.3-1 buttons */
+
+        .canvasBtns {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         /* 로딩 스피너 스타일 */
@@ -154,15 +192,15 @@
         }
 
         button {
-            position: relative;
-            display: inline-block;
-            cursor: pointer;
-            outline: none;
-            border: 0;
-            vertical-align: middle;
-            text-decoration: none;
-            font-family: 'CookieRun';
             &.learn-more {
+                position: relative;
+                display: inline-block;
+                cursor: pointer;
+                outline: none;
+                border: 0;
+                vertical-align: middle;
+                text-decoration: none;
+                font-family: 'CookieRun';
                 font-weight: bold;
                 font-size: 20px;
                 margin-top: 10px;
@@ -209,48 +247,130 @@
             }
         }
 
+        input#text {
+            all: unset;
+            padding: 10px;
+            text-align: center;
+            border: 20px;
+            background-color: white;
+            border-radius: 10px;
+        }
+        input#file {
+            display: none;
+        }
+
+        button {
+            &.canvasButton{
+                all: unset;
+                padding: 5px 0;
+                text-align: center;
+                background-color: royalblue;
+                color: white;
+                font-weight: 500;
+                cursor: pointer;
+                border-radius: 10px;
+                transition: opacity linear .1s;
+                &:hover {
+                    opacity: 0.85;
+                }
+            }
+        }
+
+        .lineContainer {
+            background-color: white; /* 배경을 하얀색으로 설정 */
+            border: 5px solid #000; /* 테두리 두께와 색상 설정 */
+            border-radius: 15px; /* 네모의 모서리 둥글게 처리 */
+            display: flex; /* Flexbox를 사용하여 가운데 정렬 설정 */
+            padding: 10px; /* 테두리와 이미지 사이의 간격 */
+            margin: 0 auto; /* 가운데 정렬 */
+            overflow: hidden; /* 넘치는 부분 숨김 */
+            text-align: center; /* 이미지를 가운데에 위치 */
+            transition: transform 0.2s;
+            flex-direction: column;
+            font-family: 'CookieRun';
+            font-weight: bold;
+            font-size: 20px;
+            width: 300px;
+        }
+
     </style>
 </head>
 <body>
-    <div id="canvascontainer" class="container">
-        <p>선택한 동물 : {{ animal_name }}</p>
-        <div class="controls">
-            <!-- 색상 선택기 -->
-            <label for="colorPicker">색상 선택</label>
-            <input type="color" id="colorPicker" value="#000000">
-
-            <!-- 버킷 페인트 (전체 캔버스 채우기) -->
-            <button onclick="useBucketFill()">전체 채우기</button>
-
-            <!-- 경로 따라 채우기 -->
-            <button onclick="fillAlongPath()">경로 채우기</button>
-
-            <!-- 지우개 도구 -->
-            <button onclick="useEraser()">지우개</button>
-
-            <!-- 되돌리기 / 다시하기 -->
-            <button onclick="undo()">되돌리기</button>
-            <button onclick="redo()">다시하기</button>
-
-            <!-- 캔버스 초기화 -->
-            <button onclick="clearCanvas()">전체 지우기</button>
-
-            <button onclick="uploadImage()">제출하기</button>
-
-            <div class="color-palette">
-                <button class="color-button" style="background-color: black;" onclick="changeColor('#000000')"></button>
-                <button class="color-button" style="background-color: white;" onclick="changeColor('#FFFFFF')"></button>
-                <button class="color-button" style="background-color: red;" onclick="changeColor('#FF0000')"></button>
-                <button class="color-button" style="background-color: orange;" onclick="changeColor('#FFA500')"></button>
-                <button class="color-button" style="background-color: yellow;" onclick="changeColor('#FFFF00')"></button>
-                <button class="color-button" style="background-color: green;" onclick="changeColor('#008000')"></button>
-                <button class="color-button" style="background-color: blue;" onclick="changeColor('#0000FF')"></button>
-                <button class="color-button" style="background-color: navy;" onclick="changeColor('#000080')"></button>
-                <button class="color-button" style="background-color: purple;" onclick="changeColor('#800080')"></button>
-            </div>
-
+    <div id="colors">
+        <input type="color" id="color" />
+        <div class="color-options">
+            <div
+            class="color-option"
+            style="background-color: #000000"
+            data-color="#000000"
+            ></div>
+            <div
+            class="color-option"
+            style="background-color: #3498db"
+            data-color="#3498db"
+            ></div>
+            <div
+            class="color-option"
+            style="background-color: #34495e"
+            data-color="#34495e"
+            ></div>
+            <div
+            class="color-option"
+            style="background-color: #27ae60"
+            data-color="#27ae60"
+            ></div>
+            <div
+            class="color-option"
+            style="background-color: #8e44ad"
+            data-color="#8e44ad"
+            ></div>
+            <div
+            class="color-option"
+            style="background-color: #f1c40f"
+            data-color="#f1c40f"
+            ></div>
+            <div
+            class="color-option"
+            style="background-color: #e74c3c"
+            data-color="#e74c3c"
+            ></div>
+            <div
+            class="color-option"
+            style="background-color: #95a5a6"
+            data-color="#95a5a6"
+            ></div>
+            <div
+            class="color-option"
+            style="background-color: #d35400"
+            data-color="#d35400"
+            ></div>
+            <div
+            class="color-option"
+            style="background-color: #2ecc71"
+            data-color="#2ecc71"
+            ></div>
+            <div
+            class="color-option"
+            style="background-color: #e67e22"
+            data-color="#e67e22"
+            ></div>
         </div>
-        <canvas id="drawingCanvas" width="500" height="500" style="border:1px solid #000;"></canvas>
+    </div>
+    <canvas id="canvasThis"></canvas>
+    <div id="canvasBtns" class="canvasBtns">
+        <div class="lineContainer">
+            <p>동화의 주인공<br>{{ animal_name }}</p>
+            <p>선 굵기</p>
+            <input id="line-width" type="range" min="1" max="30" value="5" step="0.1"/>
+        </div>
+{#        <label for="file">#}
+{#            <button class="learn-more">사진추가</button>#}
+{#            <input type="file" accept="image/*" id="file"/>#}
+{#        </label>#}
+        <button onclick="onEraseClick()" id="eraser-btn" class="learn-more">지워 버려</button>
+        <button onclick="onDestroyClick()" id="destroy-btn" class="learn-more">모두 파괴</button>
+        <button onclick="onSaveClick()" id="save" class="learn-more">내 그림 소장</button>
+        <button onclick="uploadImage()" class="learn-more">동화 만들러 가자 !</button>
     </div>
 
     <div id="successButton" style="display: none;">
@@ -301,7 +421,16 @@
 
     <script>
 
-        const canvas = document.getElementById("drawingCanvas");
+        $(document).ready(function() {
+            document.getElementById("animalInput_1").value = "{{ animal_name }}";
+            document.getElementById("animalInput_2").value = "{{ animal_name }}";
+            document.getElementById("animalInput_3").value = "{{ animal_name }}";
+        });
+
+        const colorOptions = Array.from(
+            document.getElementsByClassName("color-option")
+        );
+        const canvas = document.querySelector("canvas");
         const ctx = canvas.getContext("2d");
 
         document.addEventListener("DOMContentLoaded", function() {
@@ -309,125 +438,135 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         });
 
-        let painting = false;
-        let color = "#000000";
-        let usingEraser = false;
-        const paths = [];
-        let currentPath = [];
-        let redoStack = [];
+        const lineWidth = document.getElementById('line-width');
+        const color = document.getElementById('color');
+        const modeBtn = document.getElementById('mode-btn');
+        const destroyBtn = document.getElementById('destroy-btn');
+        const eraserBtn = document.getElementById('eraser-btn');
+        const fileInput = document.getElementById('file');
+        const textInput = document.getElementById('text');
+        const saveBtn = document.getElementById("save");
+        canvas.width = 800;
+        canvas.height = 800;
+        ctx.lineWidth = lineWidth.value;
+        let isPainting = false;
+        let isFilling = false;
 
-        canvas.addEventListener("mousedown", () => {
-            painting = true;
-            currentPath = [];
-        });
+        // 선 그리기
 
-        canvas.addEventListener("mouseup", () => {
-            painting = false;
-            ctx.beginPath();
-            paths.push(currentPath);
-            redoStack = [];  // clear the redo stack whenever a new stroke is added
-        });
-
-        canvas.addEventListener("mousemove", draw);
-
-        function changeColor(newColor) {
-            color = newColor;
-            usingEraser = false;
-        }
-
-        function useBucketFill() {
-            ctx.fillStyle = color;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-
-        function fillAlongPath() {
-            ctx.fillStyle = color;
-            ctx.beginPath();
-
-            for (const path of paths) {
-                for (let i = 0; i < path.length; i++) {
-                    const { x, y } = path[i];
-                    if (i === 0) {
-                        ctx.moveTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
-                    }
-                }
+        function onMove(event) {
+            if (isPainting) {
+                ctx.lineTo(event.offsetX, event.offsetY);
+                ctx.stroke();
+                return;
             }
-
-            ctx.closePath();
-            ctx.fill();
-        }
-
-        function draw(e) {
-            if (!painting) return;
-
-            ctx.lineWidth = 6;
-            ctx.lineCap = "round";
-
-            if (usingEraser) {
-                ctx.globalCompositeOperation = "destination-out";
-            } else {
-                ctx.globalCompositeOperation = "source-over";
-            }
-
-            ctx.strokeStyle = color;
-
-            ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
-            ctx.stroke();
             ctx.beginPath();
-            ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
-
-            currentPath.push({ x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop });
+            ctx.moveTo(event.offsetX, event.offsetY);
         }
 
-        document.getElementById("colorPicker").addEventListener("change", (e) => {
-            usingEraser = false;
-            color = e.target.value;
-        });
-
-        function undo() {
-            if (paths.length === 0) return;
-
-            redoStack.push(paths.pop());
-            redraw();
+        function startPainting() {
+            isPainting = true;
         }
 
-        function redo() {
-            if (redoStack.length === 0) return;
-
-            paths.push(redoStack.pop());
-            redraw();
+        function cancelPainting() {
+            isPainting = false;
         }
 
-        function redraw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.addEventListener("mousemove", onMove);
+        canvas.addEventListener("mousedown", startPainting);
+        canvas.addEventListener("mouseup", cancelPainting);
+        canvas.addEventListener("mouseleave", cancelPainting);
 
-            for (const path of paths) {
-                ctx.beginPath();
+        // 선 굵기
 
-                for (const point of path) {
-                    ctx.lineTo(point.x, point.y);
-                    ctx.stroke();
-                    ctx.beginPath();
-                    ctx.moveTo(point.x, point.y);
-                }
+        function onLineWidthChange(event) {
+            ctx.lineWidth = event.target.value;
+        }
+
+        lineWidth.addEventListener("change", onLineWidthChange)
+
+        // 선 색상 #1
+
+        function onColorChange(event) {
+            ctx.strokeStyle = event.target.value;
+            ctx.fillStyle = event.target.value;
+        }
+
+        color.addEventListener("change", onColorChange)
+
+        // 선 색상 #2
+
+        function onColorClick(event) {
+            const colorValue = event.target.dataset.color;
+            ctx.strokeStyle = colorValue;
+            ctx.fillStyle = colorValue;
+            color.value = colorValue;
+        }
+
+        colorOptions.forEach((colorOption) => colorOption.addEventListener("click", onColorClick))
+
+        // 그림판 전체 색상
+
+        function onCanvasClick() {
+            if (isFilling) {
+                ctx.fillRect(0,0, canvas.width, canvas.height)
             }
         }
 
-        function clearCanvas() {
-            paths.length = 0;
-            redoStack.length = 0;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function onModeClick() {
+            isFilling = false;
+            modeBtn.innerText = "Drawing Mode";
         }
 
-        function useEraser() {
-            usingEraser = true;
+        modeBtn.addEventListener("click", onModeClick)
+        canvas.addEventListener("click", onCanvasClick)
+
+        // 전체 지우개
+
+        function onDestroyClick() {
+            ctx.fillStyle = "white";
+            ctx.fillRect(0,0, canvas.width, canvas.height);
         }
 
-        document.getElementById("animalInput_1").value = "{{ animal_name }}";
-        document.getElementById("animalInput_2").value = "{{ animal_name }}";
-        document.getElementById("animalInput_3").value = "{{ animal_name }}";
+        destroyBtn.addEventListener("click", onDestroyClick);
+
+        // 부분 지우개 (하얀 선 그리기)
+
+        function onEraseClick() {
+            ctx.strokeStyle = "white";
+            isFilling = false;
+        }
+
+        eraserBtn.addEventListener("click", onEraseClick);
+
+        //밈 만들기
+
+        // 이미지 추가
+
+        function onFileChange(event) {
+            const file = event.target.files[0];
+            const url = URL.createObjectURL(file);
+            const image = new Image();
+            image.src = url;
+            image.onload = function () {
+                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+                fileInput.value = null;
+            };
+        }
+
+        fileInput.addEventListener("change", onFileChange);
+
+        // 만든 이미지 저장하기
+
+        function onSaveClick() {
+            const url = canvas.toDataURL();
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "myDrawing.png";
+            a.click();
+        }
+
+        saveBtn.addEventListener("click", onSaveClick);
 
         function sendData() {
             let animalName = document.getElementById('animalInput').value;
@@ -462,7 +601,9 @@
                 processData: false,
                 contentType: "application/json",
                 success: function(response) {
-                    $("#canvascontainer").hide(); // 업로드 컨테이너 숨기기
+                    $("#colors").hide();
+                    $("#canvasBtns").hide();
+                    $("#canvasThis").hide();
                     $("#successButton").show(); // 전송 버튼 보여주기
                     $("#result1").html("제목 : " + response[0][0] + "<br><br>" + "내용 : " + response[1][0] + "<br>");
                     document.getElementById("titleInput_1").value = response[0][0];
@@ -498,6 +639,7 @@
         function getCanvasData() {
             // 현재 canvas의 내용을 저장
             var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
             // canvas를 흰색으로 채움
             ctx.fillStyle = "white";
