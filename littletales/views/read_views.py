@@ -79,7 +79,7 @@ def read_index() :
 
     print('결과 값 : ', result_list)
 
-    backgrounds = [result_list[2][0], result_list[2][1], result_list[2][2]]
+    backgrounds = [result_list[2][0], result_list[2][1], result_list[2][2],result_list[2][3]]
     images = []
 
     header, image_data_base64 = image_data_url.split(',', 1)
@@ -120,22 +120,22 @@ def read_index() :
     session['title_response1'] = result_list[0][0]
     session['title_response2'] = result_list[0][1]
     session['title_response3'] = result_list[0][2]
-    # session['title_response4'] = result_list[0][3]
+    session['title_response4'] = result_list[0][3]
 
     session['chat_response1'] = result_list[1][0]
     session['chat_response2'] = result_list[1][1]
     session['chat_response3'] = result_list[1][2]
-    # session['chat_response4'] = result_list[1][3]
+    session['chat_response4'] = result_list[1][3]
 
     session['place_response1'] = result_list[2][0]
     session['place_response2'] = result_list[2][1]
     session['place_response3'] = result_list[2][2]
-    # session['place_response4'] = result_list[2][3]
+    session['place_response4'] = result_list[2][3]
 
     session['image_response1'] = image_response[0]
     session['image_response2'] = image_response[1]
     session['image_response3'] = image_response[2]
-    # session['image_response4'] = image_response[3]
+    session['image_response4'] = image_response[3]
 
     title_response1 = result_list[0][0]
     chat_response1 = result_list[1][0]
@@ -200,7 +200,8 @@ def gen_image(image_data, background) :
     print("배경제거된 이미지 저장 완료 : ", rembg_path)
 
     # 주어진 배경 키워드를 사용하여 프롬프트를 설정
-    prompt = f"depict the background as a {background} fairy tale with the characteristics of the painting"
+    #prompt = f"depict the background as a {background} fairy tale with the characteristics of the painting"
+    prompt = f"make {background} based on painting features like fairy tale, make be colorful except literal"
     print("프롬프트 입력 완료 : ", prompt)
 
     # 이미지 생성

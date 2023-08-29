@@ -136,6 +136,9 @@ def make_story(target,title,plot):
     user2='''
     숟가락,한 마법 숟가락이 주인과 함께 모험을 떠납니다 ,숟가락은 마법력을 가지고 있어 다양한 재미있는 일들을 경험하며 주인을 도와줍니다.
     '''
+    user3='''
+    양말,마법 양말의 이야기 ,한 쌍의 마법 양말이 주인을 도와주는 이야기입니다. 마법 양말들은 주인의 소원을 이루어주고 어려움을 함께 극복합니다.
+    '''
 
     assistant1='''
     {
@@ -194,6 +197,35 @@ def make_story(target,title,plot):
     }
     '''
 
+    assistant3='''
+    {
+    "keyword": "양말",
+    "paragraphs": [
+        {
+        "subtitle": "마법 양말의 등장",
+        "content": "한 소년이 아무런 기대도 갖지 않고 있는 양말을 발견했어요. 그 양말은 신기하게도 마법력을 가지고 있었어요. 주인의 소원을 이뤄주고 함께 어려움을 극복하는 마법 양말이었어요. 양말은 주인과 우정을 맺고 함께 다양한 모험을 떠나기로 했어요.",
+        "location": "Boy's bedroom"
+        },
+        {
+        "subtitle": "마법 양말과 주인의 소원 이루기",
+        "content": "마법 양말은 주인의 소원을 이루기 위해 노력했어요. 양말은 주인이 가장 바라는 것들을 알아차리고 마법을 사용하여 이루어주었어요. 주인은 양말의 힘에 감사하며 동시에 양말을 돕기 위해 최선을 다하기로 결심했어요.",
+        "location": "Various places to fulfill wishes"
+        },
+        {
+        "subtitle": "마법 양말과 주인의 어려움 극복",
+        "content": "마법 양말과 주인은 함께 어려움을 극복하기 위해 노력했어요. 양말은 주인의 특별한 능력을 발견하고 그것을 이용하여 어려운 상황을 해결해주었어요. 주인과 양말은 서로를 믿고 함께 협력하여 모든 어려움을 해결해나갔어요.",
+        "location": "Challenging situations"
+        },
+        {
+        "subtitle": "마법 양말과 주인의 행복한 결말",
+        "content": "마지막으로 양말과 주인은 어려움을 극복하고 모험이 끝났어요. 그들은 더욱 강해진 우정과 함께 행복한 일상을 즐길 수 있었어요. 주인은 양말에게 감사한 마음을 전하며 평생 함께할 것을 약속했어요.",
+        "location": "In a cozy home"
+        }
+    ],
+    "illustration": "Draw the magic socks as colorful and charming, with patterns and symbols to represent their magical abilities. The owner can be drawn as a young boy or girl, with a big smile and a sense of wonder."
+    }
+    '''
+
 
     messages=[
             {"role": "system", "content": system_text},
@@ -201,6 +233,8 @@ def make_story(target,title,plot):
             {"role": "assistant", "content": assistant1},
             {"role": "user", "content": user2},
             {"role": "assistant", "content": assistant2},
+            {"role": "user", "content": user3},
+            {"role": "assistant", "content": assistant3},
             {"role": "user", "content": input_text},
         ]
 
@@ -216,10 +250,11 @@ def make_story(target,title,plot):
     subtitle=[]
     content=[]
     location=[]
-    for i in range(0,3):
+    for i in range(0,4):
         subtitle.append(make_title_json["paragraphs"][i]["subtitle"])
         content.append(make_title_json["paragraphs"][i]["content"])
         location.append(make_title_json["paragraphs"][i]["location"])
 
     result_list=[subtitle,content,location]
+    print(result_list)
     return result_list

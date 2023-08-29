@@ -60,6 +60,8 @@ def image_index() :
     output.save('rembg.png')
     print("배경제거된 이미지 저장 완료")
 
+    place = "a dog house"
+    prompt = f"make {place} based on painting features like fairy tale, make be colorful except literal"
     prompt = "depict the background as a fairy tale with the characteristics of the painting "
     print("프롬프트 입력 완료")
 
