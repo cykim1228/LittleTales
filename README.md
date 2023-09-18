@@ -65,5 +65,5 @@
   </tr>
 </table>
 
-<iframe width="1044" height="587" src="https://youtu.be/j1jml7ozTXU?si=PqZd1GDapHuwZ3bf" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+[![LITTLETALES_시연](http://img.youtube.com/vi/j1jml7ozTXU/0.jpg)](https://youtu.be/j1jml7ozTXU)
 
